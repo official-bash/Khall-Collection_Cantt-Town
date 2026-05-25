@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دعوتِ اسلامی - کینٹ ٹاؤن کھال کلیکشن مہم</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        .font-nastaliq {
+            font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
+            line-height: 2.3;
+        }
+        .font-naskh {
+            font-family: 'Noto Naskh Arabic', sans-serif;
+        }
+        .font-sans {
+            font-family: 'Outfit', 'Inter', sans-serif;
+        }
+        .poster-glow {
+            background: linear-gradient(to bottom, #ffe89e 0%, #f3be44 40%, #a47618 70%, #fbf0b9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .green-glow {
+            text-shadow: 0px 4px 10px rgba(16, 185, 129, 0.3);
+        }
+        /* Active Tab Styling - Green Accent */
+        .tab-active {
+            background-color: #0f5132;
+            color: white;
+            box-shadow: 0 8px 20px -4px rgba(15, 81, 50, 0.4);
+        }
+        /* Color Palette & Custom Styles */
+        .bg-warm-vanilla {
+            background-color: #FAF8F4;
+        }
+        .bg-clay-brown {
+            background-color: #8B5A2B;
+        }
+        .text-clay-brown {
+            color: #8B5A2B;
+        }
+        .border-clay-brown {
+            border-color: #8B5A2B;
+        }
+        /* Smooth Transitions */
+        .interactive-card {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .interactive-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -10px rgba(139, 90, 43, 0.15), 0 4px 12px -5px rgba(15, 81, 50, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-warm-vanilla text-slate-800 min-h-screen font-naskh flex flex-col antialiased">
+
+    <!-- Header Block -->
+    <header class="bg-white border-b border-emerald-100 shadow-sm sticky top-0 z-40 backdrop-blur-md bg-opacity-95">
+        <div class="max-w-6xl mx-auto px-4 py-3.5 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-[#0f5132] rounded-xl flex items-center justify-center font-bold text-white shadow-md shadow-emerald-950/20">DI</div>
+                <div>
+                    <h1 id="headerTitle" class="text-base md:text-lg font-extrabold text-[#0f5132]">کھال کلیکشن ڈیش بورڈ 2026</h1>
+                    <p id="headerSub" class="text-[11px] font-bold text-clay-brown">کینٹ ٹاؤن (Cantt Town) راولپنڈی زون</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <!-- Dynamic Language Switcher Toggle -->
+                <button id="langToggleBtn" onclick="toggleLanguage()" class="bg-[#FAF4EE] hover:bg-[#F3E6D5] text-[#8B5A2B] font-extrabold px-3 py-1.5 rounded-full text-xs transition duration-150 flex items-center gap-1.5 border border-[#E9D5BE]">
+                    🌐 <span id="langText">English</span>
+                </button>
+
+                <!-- Points Badge -->
+                <div class="bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full text-[11px] md:text-xs flex items-center gap-1.5 font-bold text-emerald-800">
+                    <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+                    <span id="totalPointsLabel">ٹوٹل پوائنٹس: </span>
+                    <span id="totalPointsBadge" class="font-extrabold text-emerald-700">0</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs Menu -->
+    <nav class="max-w-md mx-auto w-full px-4 mt-6">
+        <div class="bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm flex gap-2">
+            <button id="homeTabBtn" onclick="switchTab('home')" class="flex-1 py-3 px-4 rounded-xl text-sm font-extrabold transition duration-200 flex items-center justify-center gap-2 tab-active">
+                <span id="homeTabLabel">🏠 ہوم پیج</span>
+            </button>
+            <button id="addLocTabBtn" onclick="switchTab('addLocation')" class="flex-1 py-3 px-4 rounded-xl text-sm font-extrabold text-slate-500 hover:text-[#8B5A2B] hover:bg-[#FAF4EE]/50 transition duration-200 flex items-center justify-center gap-2">
+                <span id="addLocTabLabel">📍 لوکیشن شامل کریں</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Workspace -->
+    <main class="max-w-6xl w-full mx-auto px-4 py-6 flex-grow">
+        
+        <!-- Loading Spinner Container -->
+        <div id="appSpinner" class="flex flex-col items-center justify-center py-20 space-y-4">
+            <div class="w-12 h-12 border-4 border-[#0f5132] border-t-transparent rounded-full animate-spin"></div>
+            <p id="spinnerLoadingText" class="text-sm font-bold text-clay-brown animate-pulse">گوگل شیٹ سے ڈیٹا لوڈ کیا جا رہا ہے، براہ کرم انتظار کریں...</p>
+        </div>
+
+        <!-- Tab 1 Screen: Dashboard Home -->
+        <div id="homeTabScreen" class="hidden space-y-6">
+            
+            <!-- Beautiful Search Container -->
+            <div class="bg-white border border-emerald-100 rounded-2xl p-4 md:p-5 shadow-sm">
+                <div class="relative">
+                    <span class="absolute inset-y-0 right-4 flex items-center text-xl pointer-events-none">🔍</span>
+                    <input type="text" id="omniSearchInput" oninput="handleSearch()"
+                           placeholder="پوائنٹ کا نام، ذمہ دار کا نام، لوکیشن (انگلش یا اردو) سے تلاش کریں..." 
+                           class="w-full bg-[#FAF8F4]/60 border border-emerald-800/10 rounded-xl pr-12 pl-4 py-3.5 text-sm md:text-base text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#0f5132] focus:bg-white transition duration-150 shadow-inner">
+                </div>
+                <div id="searchStats" class="text-xs font-bold text-clay-brown mt-2.5 mr-1 hidden"></div>
+            </div>
+
+            <!-- Union Councils Grid Block -->
+            <div id="ucGridSection" class="space-y-4">
+                <h2 id="ucSectionHeading" class="text-base md:text-lg font-extrabold text-slate-800 flex items-center gap-2">
+                    <span class="text-[#0f5132]">❖</span> یوزیز (UC) کی فہرست
+                </h2>
+                <div id="ucCardGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    <!-- UC Cards populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Detailed Points List Block -->
+            <div id="pointsListSection" class="space-y-4 hidden border-t border-slate-200/60 pt-6">
+                <div class="flex justify-between items-center gap-4 flex-wrap">
+                    <h2 id="pointsSectionHeader" class="text-base md:text-lg font-extrabold text-[#0f5132]"></h2>
+                    <button id="backToUcsBtn" onclick="backToUcGrid()" class="text-xs bg-[#FAF4EE] hover:bg-[#F3E6D5] text-[#8B5A2B] font-bold px-3.5 py-2 rounded-xl transition border border-[#E9D5BE] shadow-sm">
+                        ← تمام یوزیز واپس دیکھیں
+                    </button>
+                </div>
+                <div id="pointsContainerList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Points cards populated dynamically -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Tab 2 Screen: Add Map Location -->
+        <div id="addLocationTabScreen" class="hidden max-w-xl mx-auto">
+            <div class="bg-white border border-emerald-100 rounded-2xl p-6 shadow-md space-y-5 relative overflow-hidden">
+                <div class="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-[#8B5A2B] via-[#0f5132] to-amber-500"></div>
+                
+                <div>
+                    <h2 id="formTitleText" class="text-lg md:text-xl font-extrabold text-[#0f5132] flex items-center gap-2">📍 گوگل میپ لوکیشن لنک اپڈیٹ کریں</h2>
+                    <p id="formSubtitleText" class="text-xs font-bold text-slate-500 mt-1">فہرست میں صرف وہی پوائنٹس نظر آئیں گے جن کا میپ لنک شیٹ پر اب تک شامل نہیں ہے۔</p>
+                </div>
+
+                <hr class="border-slate-100" />
+
+                <div class="space-y-4">
+                    <div>
+                        <label id="formUcSelectLabel" class="block text-xs font-extrabold text-slate-600 mb-1.5">1۔ یو سی (UC) منتخب کریں:</label>
+                        <select id="formUcSelect" onchange="populateFormSerialNumbers()" class="w-full bg-[#FAF8F4] border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold focus:outline-none focus:border-[#0f5132] text-slate-800 shadow-sm transition">
+                            <option value="">-- یو سی منتخب کریں --</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label id="formSrNoSelectLabel" class="block text-xs font-extrabold text-slate-600 mb-1.5">2۔ نمبر شمار / پوائنٹ منتخب کریں:</label>
+                        <select id="formSrNoSelect" class="w-full bg-[#FAF8F4] border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold focus:outline-none focus:border-[#0f5132] text-slate-800 shadow-sm transition">
+                            <option value="">-- پہلے یو سی منتخب کریں --</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label id="formMapUrlInputLabel" class="block text-xs font-extrabold text-slate-600 mb-1.5">3۔ گوگل میپ لوکیشن لنک (Google Map Link):</label>
+                        <input type="url" id="formMapUrlInput" placeholder="https://maps.app.goo.gl/..." 
+                               class="w-full bg-[#FAF8F4] border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#0f5132] text-slate-800 placeholder-slate-400 shadow-sm transition">
+                    </div>
+
+                    <div class="bg-[#FAF4EE]/70 p-4 rounded-xl border border-[#E9D5BE] space-y-2">
+                        <label id="formPasswordInputLabel" class="block text-xs font-extrabold text-[#8B5A2B]">🛡️ سیکیورٹی پاس ورڈ تصدیق:</label>
+                        <input type="password" id="formPasswordInput" maxlength="4" placeholder="منتخب کردہ ذمہ دار کے موبائل نمبر کے آخری 4 ہندسے لکھیں" 
+                               class="w-full bg-white border border-[#E9D5BE] rounded-lg px-3 py-2.5 text-center text-sm tracking-widest font-extrabold focus:outline-none focus:border-[#0f5132] text-slate-800 shadow-sm">
+                    </div>
+
+                    <button onclick="submitLocationUpdate()" class="w-full bg-[#0f5132] hover:bg-[#157347] text-white font-extrabold py-3.5 px-4 rounded-xl transition duration-200 shadow-md shadow-emerald-950/20 flex items-center justify-center gap-2">
+                        <span id="formSubmitBtnLabel">🚀 گوگل شیٹ پر محفوظ کریں</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Hidden Poster Generator Target -->
+    <div class="fixed left-[-9999px] top-[-9999px]">
+        <div id="imagePosterGeneratorCanvas" class="w-[500px] aspect-[2/3] bg-gradient-to-b from-[#032d54] via-[#05437a] to-[#011c36] p-4 flex flex-col justify-between relative" dir="rtl">
+            <div class="absolute inset-0 opacity-10 pointer-events-none bg-repeat opacity-5" style="background-image: radial-gradient(circle, white 2px, transparent 2px); background-size: 20px 20px;"></div>
+            
+            <div class="text-center space-y-2 relative z-10">
+                <h2 id="posterMainTitle" class="font-nastaliq poster-glow text-5xl font-extrabold tracking-normal py-1 leading-tight drop-shadow-xl">قربانی کی کھالیں</h2>
+                <p id="posterSubTitle" class="text-cyan-200 text-xs font-bold tracking-wider bg-black/40 px-4 py-1 rounded-full inline-block border border-cyan-500/10">عاشقان رسول کی دینی تحریک</p>
+                <h1 id="posterBrandTitle" class="font-nastaliq text-emerald-400 text-4xl font-black py-1 green-glow leading-none">دعوت اسلامی</h1>
+                <p id="posterActionTitle" class="font-nastaliq text-yellow-300 text-base font-medium">کو دے کر دینی کاموں میں حصہ لیجیے</p>
+            </div>
+
+            <div class="bg-gradient-to-b from-[#0f4d87] to-[#062c52] rounded-2xl border-[3px] border-[#ffd700] shadow-2xl overflow-hidden mt-4 flex-grow flex flex-col justify-between">
+                <div class="bg-gradient-to-r from-yellow-500 via-amber-400 to-yellow-500 py-2 px-4 text-center border-b-[2px] border-[#ffd700]">
+                    <h3 id="canvasDynamicTitle" class="font-nastaliq text-xl font-black text-amber-950 leading-none">وارڈ لوکیشنز انفارمیشن</h3>
+                </div>
+                
+                <div class="p-4 flex-grow flex flex-col justify-center">
+                    <div id="canvasDynamicBody" class="w-full text-slate-100 space-y-3">
+                        <!-- Dynamic details added via JS -->
+                    </div>
+                </div>
+
+                <div id="posterFooterText" class="bg-black/30 py-1.5 text-center text-[10px] text-slate-400 border-t border-white/5">
+                    کینٹ ٹاؤن راولپنڈی مہم ڈیش بورڈ پینل
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="toastNotificationShelf" class="fixed bottom-5 left-5 z-55 space-y-2 max-w-sm pointer-events-none"></div>
+
+    <!-- Config Import & Application Script -->
+    <script src="config.js"></script>
+    <script>
+        // Bilingual Localization Dictionary Mapping Core
+        const i18n = {
+            ur: {
+                title: "دعوتِ اسلامی - کینٹ ٹاؤن کھال کلیکشن مہم",
+                dashboardTitle: "کھال کلیکشن ڈیش بورڈ 2026",
+                townName: "کینٹ ٹاؤن (Cantt Town) راولپنڈی زون",
+                totalPoints: "ٹوٹل پوائنٹس",
+                homeTab: "🏠 ہوم پیج",
+                addLocationTab: "📍 لوکیشن شامل کریں",
+                loading: "گوگل شیٹ سے ڈیٹا لوڈ کیا جا رہا ہے، براہ کرم انتظار کریں...",
+                searchPlaceholder: "پوائنٹ کا نام، ذمہ دار کا نام، لوکیشن (انگلش یا اردو) سے تلاش کریں...",
+                ucSectionHeader: "❖ یوزیز (UC) کی فہرست",
+                pointsListHeader: "لوکیشن پوائنٹس",
+                backToUcs: "← تمام یوزیز واپس دیکھیں",
+                formTitle: "📍 گوگل میپ لوکیشن لنک اپڈیٹ کریں",
+                formSubtitle: "فہرست میں صرف وہی پوائنٹس نظر آئیں گے جن کا میپ لنک شیٹ پر اب تک شامل نہیں ہے۔",
+                selectUcLabel: "1۔ یو سی (UC) منتخب کریں:",
+                selectPointLabel: "2۔ نمبر شمار / پوائنٹ منتخب کریں:",
+                mapLinkLabel: "3۔ گوگل میپ لوکیشن لنک (Google Map Link):",
+                securityLabel: "🛡️ سیکیورٹی پاس ورڈ تصدیق:",
+                securityPlaceholder: "منتخب کردہ ذمہ دار کے موبائل نمبر کے آخری 4 ہندسے لکھیں",
+                submitBtn: "🚀 گوگل شیٹ پر محفوظ کریں",
+                selectUcDefault: "-- یو سی منتخب کریں --",
+                selectPointDefault: "-- پہلے یو سی منتخب کریں --",
+                pointsCount: "پوائنٹس",
+                serial: "سیریل",
+                responsible: "ذمہ دار",
+                whatsappBtn: "💬 واٹس ایپ اوپن کریں",
+                mapBtn: "🗺️ گوگل میپ لوکیشن",
+                addMapBtn: "➕ میپ لنک ایڈ کریں",
+                shareBtn: "📢 شیئر",
+                sharingPoster: "شیئرنگ پوسٹر امیج تیار کی جا رہی ہے...",
+                successShare: "پوسٹ کامیابی سے شیئر کر دی گئی ہے!",
+                fallbackShare: "آپ کا ڈیوائس ڈائریکٹ شیئرنگ سپورٹ نہیں کرتا۔ پوسٹر امیج ڈاؤن لوڈ کی جا رہی ہے...",
+                setupIncomplete: "سیٹ اپ ادھورا ہے! برائے مہربانی config.js میں اپنا Google Apps Script URL درج کریں۔",
+                configError: "ایپ کنفگریشن ایرر: Apps Script کا درست URL لنک نہیں مل سکا۔",
+                connectionError: "ڈیٹا کنکشن میں خرابی آئی ہے۔ برائے مہربانی پیج ریفریش کریں۔",
+                toastAllFields: "براہ کرم فارم کے تمام خانے درست تفصیلات سے پُر کریں!",
+                toastValidUrl: "براہ کرم درست گوگل میپ یو آر ایل (URL) لنک درج کریں!",
+                toastAutoSelected: "یو سی اور سیریل نمبر خودکار طور پر فارم میں منتخب کر لیے گئے ہیں۔",
+                toastUpdated: "لوکیشن لنک کامیابی سے اپڈیٹ کر دیا گیا ہے!",
+                allPointsUpdated: "🎉 اس یو سی کے تمام پوائنٹس پہلے ہی اپڈیٹڈ ہیں!",
+                posterTitle: "قربانی کی کھالیں",
+                posterSubtitle: "عاشقان رسول کی دینی تحریک",
+                posterDawat: "دعوت اسلامی",
+                posterCall: "کو دے کر دینی کاموں میں حصہ لیجیے",
+                posterAddress: "📍 کلیکشن پوائنٹ ایڈریس",
+                posterRep: "پوائنٹ ذمہ دار",
+                posterPhone: "موبائل نمبر",
+                posterCampaignTitle: "وارڈ لوکیشنز انفارمیشن",
+                posterFooter: "کینٹ ٹاؤن راولپنڈی مہم ڈیش بورڈ پینل",
+                noPoints: "اس یو سی کے تحت کوئی پوائنٹس دستیاب نہیں ہیں۔",
+                searchResults: "تلاش کے نتائج",
+                foundPoints: "پوائنٹس ملے",
+                searchSummary: "کل {total} ریکارڈز میں سے {count} مماثلت پانے والے پوائنٹس تلاش کر لیے گئے ہیں۔",
+            },
+            en: {
+                title: "Dawat-e-Islami - Cantt Town Khal Collection",
+                dashboardTitle: "Khal Collection Dashboard 2026",
+                townName: "Cantt Town Rawalpindi Zone",
+                totalPoints: "Total Points",
+                homeTab: "🏠 Home Page",
+                addLocationTab: "📍 Add Location Link",
+                loading: "Loading data from Google Sheet, please wait...",
+                searchPlaceholder: "Search by point name, person in charge, location (Urdu/English)...",
+                ucSectionHeader: "❖ Union Councils (UC) List",
+                pointsListHeader: "Location Points",
+                backToUcs: "← Back to all UCs",
+                formTitle: "📍 Update Google Map Location Link",
+                formSubtitle: "Only points without a map link on the sheet will be displayed in the list.",
+                selectUcLabel: "1. Select UC (Union Council):",
+                selectPointLabel: "2. Select Point Serial / Name:",
+                mapLinkLabel: "3. Google Map Location Link:",
+                securityLabel: "🛡️ Security Password Verification:",
+                securityPlaceholder: "Enter the last 4 digits of the responsible person's mobile number",
+                submitBtn: "🚀 Save to Google Sheet",
+                selectUcDefault: "-- Select UC --",
+                selectPointDefault: "-- Select UC First --",
+                pointsCount: "Points",
+                serial: "Serial",
+                responsible: "Responsible",
+                whatsappBtn: "💬 Open WhatsApp",
+                mapBtn: "🗺️ Google Map Location",
+                addMapBtn: "➕ Add Map Link",
+                shareBtn: "📢 Share",
+                sharingPoster: "Generating shareable poster image...",
+                successShare: "Poster shared successfully!",
+                fallbackShare: "Direct sharing not supported on this device. Downloading poster image...",
+                setupIncomplete: "Setup incomplete! Please enter your Google Apps Script URL in config.js.",
+                configError: "Configuration Error: Valid Apps Script URL not found.",
+                connectionError: "Error connecting to data. Please refresh the page.",
+                toastAllFields: "Please fill all form fields with correct details!",
+                toastValidUrl: "Please enter a valid Google Maps URL!",
+                toastAutoSelected: "UC and Serial Number automatically selected in the form.",
+                toastUpdated: "Location link updated successfully!",
+                allPointsUpdated: "🎉 All points in this UC are already updated!",
+                posterTitle: "Qurbani Hides Collection",
+                posterSubtitle: "Religious movement of Ashiqan-e-Rasool",
+                posterDawat: "Dawat-e-Islami",
+                posterCall: "Donate your hides and participate in religious work",
+                posterAddress: "📍 Collection Point Address",
+                posterRep: "Person in Charge",
+                posterPhone: "Mobile Number",
+                posterCampaignTitle: "Ward Locations Information",
+                posterFooter: "Cantt Town Rawalpindi Campaign Dashboard Panel",
+                noPoints: "No points available under this UC.",
+                searchResults: "Search Results",
+                foundPoints: "Points Found",
+                searchSummary: "Found {count} matching points out of {total} total records.",
+            }
+        };
+
+        // Application Reactive Core State memory storage
+        let sheetDataset = [];
+        let uniqueUcsList = [];
+        let activeSelectedUc = null;
+        let currentLanguage = localStorage.getItem('khal_app_lang') || 'ur';
+
+        // Life Cycle Hook Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            applyLanguage();
+            fetchDatasetFromGoogleSheet();
+        });
+
+        // Toggle Application Language Setting
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'ur' ? 'en' : 'ur';
+            localStorage.setItem('khal_app_lang', currentLanguage);
+            applyLanguage();
+        }
+
+        // Apply selected language translations recursively
+        function applyLanguage() {
+            const isUrdu = currentLanguage === 'ur';
+            document.documentElement.dir = isUrdu ? 'rtl' : 'ltr';
+            document.documentElement.lang = currentLanguage;
+
+            // Adjust main font weight and family dynamically
+            if (isUrdu) {
+                document.body.classList.remove('font-sans');
+                document.body.classList.add('font-naskh');
+            } else {
+                document.body.classList.remove('font-naskh');
+                document.body.classList.add('font-sans');
+            }
+
+            // Update Page Title
+            document.title = i18n[currentLanguage].title;
+
+            // Simple text labels translation
+            document.getElementById('headerTitle').innerText = i18n[currentLanguage].dashboardTitle;
+            document.getElementById('headerSub').innerText = i18n[currentLanguage].townName;
+            document.getElementById('totalPointsLabel').innerText = i18n[currentLanguage].totalPoints + ": ";
+            document.getElementById('homeTabLabel').innerText = i18n[currentLanguage].homeTab;
+            document.getElementById('addLocTabLabel').innerText = i18n[currentLanguage].addLocationTab;
+            document.getElementById('spinnerLoadingText').innerText = i18n[currentLanguage].loading;
+
+            // Search Bar i18n
+            document.getElementById('omniSearchInput').placeholder = i18n[currentLanguage].searchPlaceholder;
+            document.getElementById('ucSectionHeading').innerText = i18n[currentLanguage].ucSectionHeader;
+            document.getElementById('backToUcsBtn').innerText = i18n[currentLanguage].backToUcs;
+
+            // Form Content i18n
+            document.getElementById('formTitleText').innerText = i18n[currentLanguage].formTitle;
+            document.getElementById('formSubtitleText').innerText = i18n[currentLanguage].formSubtitle;
+            document.getElementById('formUcSelectLabel').innerText = i18n[currentLanguage].selectUcLabel;
+            document.getElementById('formSrNoSelectLabel').innerText = i18n[currentLanguage].selectPointLabel;
+            document.getElementById('formMapUrlInputLabel').innerText = i18n[currentLanguage].mapLinkLabel;
+            document.getElementById('formPasswordInputLabel').innerText = i18n[currentLanguage].securityLabel;
+            document.getElementById('formPasswordInput').placeholder = i18n[currentLanguage].securityPlaceholder;
+            document.getElementById('formSubmitBtnLabel').innerText = i18n[currentLanguage].submitBtn;
+
+            // Poster dynamic translations
+            document.getElementById('posterMainTitle').innerText = i18n[currentLanguage].posterTitle;
+            document.getElementById('posterSubTitle').innerText = i18n[currentLanguage].posterSubtitle;
+            document.getElementById('posterBrandTitle').innerText = i18n[currentLanguage].posterDawat;
+            document.getElementById('posterActionTitle').innerText = i18n[currentLanguage].posterCall;
+            document.getElementById('posterFooterText').innerText = i18n[currentLanguage].posterFooter;
+
+            // Language Toggle Text Update
+            document.getElementById('langText').innerText = isUrdu ? 'English' : 'اردو';
+
+            // Re-render components with translated static attributes
+            if (sheetDataset.length > 0) {
+                renderUcCardsGrid(uniqueUcsList);
+                populateFormUcDropdowns();
+                if (activeSelectedUc) {
+                    handleUcCardClick(activeSelectedUc);
+                } else {
+                    const query = document.getElementById('omniSearchInput').value.trim();
+                    if (query) {
+                        handleSearch();
+                    }
+                }
+            }
+        }
+
+        // Fetch primary campaign list from App Script Endpoint securely (using GET action)
+        function fetchDatasetFromGoogleSheet() {
+            if (API_URL.includes("YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE")) {
+                showToast(i18n[currentLanguage].setupIncomplete, "error");
+                document.getElementById('appSpinner').innerHTML = `<p class="text-red-600 p-6 text-center font-bold bg-red-50 border border-red-200 rounded-xl">${i18n[currentLanguage].configError}</p>`;
+                return;
+            }
+
+            const url = API_URL + "?action=getData";
+
+            fetch(url)
+            .then(response => response.json())
+            .then(payload => {
+                if(payload.status === "success") {
+                    sheetDataset = payload.data;
+                    document.getElementById('totalPointsBadge').innerText = sheetDataset.length;
+                    
+                    // Filter and compile unique list of UCs present inside Cantt Town dataset
+                    const allUcs = sheetDataset.map(row => row["یو سی"] ? row["یو سی"].trim() : "").filter(Boolean);
+                    uniqueUcsList = [...new Set(allUcs)];
+
+                    // Render UI components asynchronously
+                    document.getElementById('appSpinner').classList.add('hidden');
+                    switchTab('home'); // Default redirect to homepage landing setup
+                    renderUcCardsGrid(uniqueUcsList);
+                    populateFormUcDropdowns();
+                } else {
+                    throw new Error(payload.message);
+                }
+            })
+            .catch(err => {
+                console.error("Critical Fetch Error: ", err);
+                showToast(i18n[currentLanguage].connectionError, "error");
+                document.getElementById('appSpinner').innerHTML = `<p class="text-red-600 font-bold p-4 bg-red-50 rounded-xl border border-red-100">${i18n[currentLanguage].connectionError}</p>`;
+            });
+        }
+
+        // Render Homepage UC Category Cards UI elements
+        function renderUcCardsGrid(ucs) {
+            const gridContainer = document.getElementById('ucCardGrid');
+            gridContainer.innerHTML = '';
+
+            ucs.forEach(ucName => {
+                const hubsCount = sheetDataset.filter(row => row["یو سی"].trim() === ucName.trim()).length;
+                const cardNode = document.createElement('div');
+                cardNode.className = "bg-white border border-[#E9D5BE]/60 hover:border-[#0f5132] p-5 rounded-2xl shadow-sm hover:shadow-md text-center cursor-pointer transition transform hover:-translate-y-0.5 active:scale-95 duration-150 flex flex-col justify-between items-center group interactive-card";
+                cardNode.onclick = () => handleUcCardClick(ucName);
+                cardNode.innerHTML = `
+                    <div class="w-12 h-12 bg-emerald-50 text-[#0f5132] group-hover:bg-[#0f5132] group-hover:text-white rounded-2xl flex items-center justify-center text-xl font-bold mb-3.5 transition duration-150 shadow-sm">🏢</div>
+                    <h3 class="text-sm md:text-base font-extrabold text-slate-800 group-hover:text-[#0f5132] transition duration-150">${ucName}</h3>
+                    <span class="mt-2.5 text-[11px] font-extrabold bg-[#FAF4EE] px-3 py-1 rounded-full text-clay-brown border border-[#E9D5BE]/40">${hubsCount} ${i18n[currentLanguage].pointsCount}</span>
+                `;
+                gridContainer.appendChild(cardNode);
+            });
+            document.getElementById('ucGridSection').classList.remove('hidden');
+        }
+
+        // Handler triggering deep drill list display
+        function handleUcCardClick(ucName) {
+            activeSelectedUc = ucName;
+            document.getElementById('ucGridSection').classList.add('hidden');
+            
+            const filteredPoints = sheetDataset.filter(row => row["یو سی"].trim() === ucName.trim());
+            document.getElementById('pointsSectionHeader').innerText = `${i18n[currentLanguage].pointsListHeader}: ${ucName}`;
+            
+            renderPointsListMarkup(filteredPoints);
+        }
+
+        // Return state machine focus tracking view frame context
+        function backToUcGrid() {
+            document.getElementById('pointsListSection').classList.add('hidden');
+            document.getElementById('ucGridSection').classList.remove('hidden');
+            document.getElementById('omniSearchInput').value = '';
+            document.getElementById('searchStats').classList.add('hidden');
+            activeSelectedUc = null;
+        }
+
+        // Render localized detailed point components cards lists layout grid system
+        function renderPointsListMarkup(pointsList) {
+            const listContainer = document.getElementById('pointsContainerList');
+            listContainer.innerHTML = '';
+
+            if (pointsList.length === 0) {
+                listContainer.innerHTML = `<p class="col-span-full text-center text-sm font-bold text-slate-400 py-8">${i18n[currentLanguage].noPoints}</p>`;
+                document.getElementById('pointsListSection').classList.remove('hidden');
+                return;
+            }
+
+            pointsList.forEach(point => {
+                const mapLink = point["Google Map Link"] ? point["Google Map Link"].trim() : "";
+                const cleanPhone = point["موبائل نمبر"] ? point["موبائل نمبر"].replace(/[^0-9]/g, "") : "";
+                const srNo = point["نمبر شمار"];
+                const ucName = point["یو سی"];
+
+                // Dynamically translate address depending on lang toggled
+                const address = currentLanguage === 'ur' 
+                    ? (point["پوائنٹ کا ایڈریس"] || point["location points"] || '') 
+                    : (point["location points"] || point["پوائنٹ کا ایڈریس"] || '');
+
+                const pointCard = document.createElement('div');
+                pointCard.className = "bg-white border border-[#E9D5BE]/50 rounded-2xl p-5 shadow-sm hover:shadow-md flex flex-col justify-between space-y-4 hover:border-[#0f5132]/30 transition duration-150 interactive-card";
+                
+                let mapBtnMarkup = '';
+                if (mapLink) {
+                    mapBtnMarkup = `
+                        <a href="${mapLink}" target="_blank" class="flex-1 py-2.5 px-3 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 font-extrabold rounded-xl text-xs transition duration-150 flex items-center justify-center gap-1.5 shadow-sm">
+                            <span>🗺️</span> ${i18n[currentLanguage].mapBtn}
+                        </a>`;
+                } else {
+                    mapBtnMarkup = `
+                        <button onclick="triggerDirectAddLocationLink('${ucName}', '${srNo}')" class="flex-1 py-2.5 px-3 bg-[#FAF4EE] hover:bg-[#F3E6D5] border border-[#E9D5BE] text-[#8B5A2B] font-extrabold rounded-xl text-xs transition duration-150 flex items-center justify-center gap-1.5 animate-pulse shadow-sm">
+                            <span>➕</span> ${i18n[currentLanguage].addMapBtn}
+                        </button>`;
+                }
+
+                pointCard.innerHTML = `
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center gap-2">
+                            <span class="bg-emerald-50 text-[#0f5132] px-2.5 py-1 rounded-lg text-xs font-extrabold border border-emerald-100 shadow-sm">${i18n[currentLanguage].serial} #${srNo}</span>
+                            <span class="text-[11px] font-extrabold text-clay-brown">${point["location points"] && currentLanguage === 'ur' ? point["location points"] : ''}</span>
+                        </div>
+                        <h4 class="text-base font-extrabold text-slate-800 leading-snug">${address}</h4>
+                        
+                        <div class="bg-[#FAF8F4] p-3 rounded-xl border border-slate-100 text-xs text-slate-600 space-y-1.5">
+                            <p class="flex items-center gap-1.5">
+                                <span class="text-[#0f5132] font-extrabold">${i18n[currentLanguage].responsible}:</span> 
+                                <span class="font-bold text-slate-800">${point["پوائنٹ ذمہ دار"]}</span>
+                            </p>
+                            <p class="flex items-center gap-1.5" dir="ltr">
+                                <span class="text-[#0f5132] font-extrabold">📞 :</span>
+                                <span class="font-extrabold text-slate-800">${point["موبائل نمبر"]}</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2 pt-3 border-t border-slate-100">
+                        ${mapBtnMarkup}
+                        <a href="https://wa.me/${cleanPhone}" target="_blank" class="flex-1 py-2.5 px-3 bg-emerald-700 hover:bg-[#0f5132] border border-[#0f5132] text-white font-extrabold rounded-xl text-xs transition duration-150 flex items-center justify-center gap-1.5 shadow-sm">
+                            <span>💬</span> ${i18n[currentLanguage].whatsappBtn}
+                        </a>
+                        <button onclick="generateAndSharePosterImage('location', '${point["نمبر شمار"]}')" class="p-2.5 bg-[#FAF4EE] hover:bg-[#F3E6D5] border border-[#E9D5BE] text-[#8B5A2B] rounded-xl text-xs font-extrabold transition duration-150 shadow-sm" title="${i18n[currentLanguage].shareBtn}">
+                            <span>📢</span>
+                        </button>
+                    </div>
+                `;
+                listContainer.appendChild(pointCard);
+            });
+
+            document.getElementById('pointsListSection').classList.remove('hidden');
+        }
+
+        // Global Omni Database Search logic calculation
+        function handleSearch() {
+            const query = document.getElementById('omniSearchInput').value.trim().toLowerCase();
+            const statsContainer = document.getElementById('searchStats');
+            
+            if (!query) {
+                statsContainer.classList.add('hidden');
+                if (activeSelectedUc) {
+                    handleUcCardClick(activeSelectedUc);
+                } else {
+                    backToUcGrid();
+                }
+                return;
+            }
+
+            const hits = sheetDataset.filter(row => {
+                const addressUrdu = (row["پوائنٹ کا ایڈریس"] || "").toLowerCase();
+                const addressEnglish = (row["location points"] || "").toLowerCase();
+                const zimadarName = (row["پوائنٹ ذمہ دار"] || "").toLowerCase();
+                const ucCell = (row["یو سی"] || "").toLowerCase();
+                
+                return addressUrdu.includes(query) || 
+                       addressEnglish.includes(query) || 
+                       zimadarName.includes(query) ||
+                       ucCell.includes(query);
+            });
+
+            document.getElementById('ucGridSection').classList.add('hidden');
+            document.getElementById('pointsSectionHeader').innerText = `${i18n[currentLanguage].searchResults} (${hits.length} ${i18n[currentLanguage].foundPoints})`;
+            
+            let summaryText = i18n[currentLanguage].searchSummary
+                .replace("{total}", sheetDataset.length)
+                .replace("{count}", hits.length);
+
+            statsContainer.innerText = summaryText;
+            statsContainer.classList.remove('hidden');
+
+            renderPointsListMarkup(hits);
+        }
+
+        // Contextual Quick shortcut bridge route map linking to update menu option
+        function triggerDirectAddLocationLink(ucName, srNo) {
+            switchTab('addLocation');
+            document.getElementById('formUcSelect').value = ucName;
+            populateFormSerialNumbers();
+            document.getElementById('formSrNoSelect').value = srNo;
+            
+            showToast(i18n[currentLanguage].toastAutoSelected, "info");
+        }
+
+        // Dynamic select dropdown option populate mapping matrix
+        function populateFormUcDropdowns() {
+            const ucDropdown = document.getElementById('formUcSelect');
+            ucDropdown.innerHTML = `<option value="">${i18n[currentLanguage].selectUcDefault}</option>`;
+
+            uniqueUcsList.forEach(uc => {
+                const opt = document.createElement('option');
+                opt.value = uc;
+                opt.innerText = uc;
+                ucDropdown.appendChild(opt);
+            });
+        }
+
+        // Populate nested conditional dropdown based on selected parent category list
+        function populateFormSerialNumbers() {
+            const selectedUc = document.getElementById('formUcSelect').value;
+            const srDropdown = document.getElementById('formSrNoSelect');
+            srDropdown.innerHTML = `<option value="">${i18n[currentLanguage].selectPointDefault}</option>`;
+
+            if (!selectedUc) return;
+
+            const missingMapPoints = sheetDataset.filter(row => {
+                const isMatch = row["یو سی"].trim() === selectedUc.trim();
+                const hasNoMap = !row["Google Map Link"] || row["Google Map Link"].trim() === "";
+                return isMatch && hasNoMap;
+            });
+
+            if (missingMapPoints.length === 0) {
+                srDropdown.innerHTML = `<option value="">${i18n[currentLanguage].allPointsUpdated}</option>`;
+                return;
+            }
+
+            missingMapPoints.forEach(point => {
+                const opt = document.createElement('option');
+                opt.value = point["نمبر شمار"];
+                const address = currentLanguage === 'ur' 
+                    ? (point["پوائنٹ کا ایڈریس"] || point["location points"] || '')
+                    : (point["location points"] || point["پوائنٹ کا ایڈریس"] || '');
+                opt.innerText = `${i18n[currentLanguage].serial} ${point["نمبر شمار"]} - ${address}`;
+                srDropdown.appendChild(opt);
+            });
+        }
+
+        // Submit form parameters using GET action
+        function submitLocationUpdate() {
+            const uc = document.getElementById('formUcSelect').value;
+            const srNo = document.getElementById('formSrNoSelect').value;
+            const mapLink = document.getElementById('formMapUrlInput').value.trim();
+            const password = document.getElementById('formPasswordInput').value.trim();
+
+            if (!uc || !srNo || !mapLink || !password) {
+                showToast(i18n[currentLanguage].toastAllFields, "error");
+                return;
+            }
+
+            if (!mapLink.startsWith("http://") && !mapLink.startsWith("https://")) {
+                showToast(i18n[currentLanguage].toastValidUrl, "error");
+                return;
+            }
+
+            document.getElementById('appSpinner').classList.remove('hidden');
+            document.getElementById('addLocationTabScreen').classList.add('opacity-40', 'pointer-events-none');
+
+            // Constructing clean query params for GET request
+            const updateUrl = API_URL
+                + "?action=updateLocation"
+                + "&uc=" + encodeURIComponent(uc)
+                + "&srNo=" + encodeURIComponent(srNo)
+                + "&mapLink=" + encodeURIComponent(mapLink)
+                + "&password=" + encodeURIComponent(password);
+
+            fetch(updateUrl)
+            .then(res => res.json())
+            .then(response => {
+                document.getElementById('appSpinner').classList.add('hidden');
+                document.getElementById('addLocationTabScreen').classList.remove('opacity-40', 'pointer-events-none');
+
+                if (response.status === "success") {
+                    showToast(i18n[currentLanguage].toastUpdated, "success");
+                    document.getElementById('formMapUrlInput').value = '';
+                    document.getElementById('formPasswordInput').value = '';
+                    fetchDatasetFromGoogleSheet();
+                } else {
+                    showToast(response.message, "error");
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                document.getElementById('appSpinner').classList.add('hidden');
+                document.getElementById('addLocationTabScreen').classList.remove('opacity-40', 'pointer-events-none');
+                showToast(i18n[currentLanguage].connectionError, "error");
+            });
+        }
+
+        // Tab viewport layout context swapper
+        function switchTab(target) {
+            const homeBtn = document.getElementById('homeTabBtn');
+            const addLocBtn = document.getElementById('addLocTabBtn');
+            const homeScreen = document.getElementById('homeTabScreen');
+            const addLocScreen = document.getElementById('addLocationTabScreen');
+
+            if (target === 'home') {
+                homeBtn.classList.add('tab-active');
+                addLocBtn.classList.remove('tab-active');
+                addLocBtn.classList.add('text-slate-500');
+                
+                homeScreen.classList.remove('hidden');
+                addLocScreen.classList.add('hidden');
+                if (activeSelectedUc) {
+                    document.getElementById('ucGridSection').classList.add('hidden');
+                    document.getElementById('pointsListSection').classList.remove('hidden');
+                } else {
+                    document.getElementById('ucGridSection').classList.remove('hidden');
+                    document.getElementById('pointsListSection').classList.add('hidden');
+                }
+            } else if (target === 'addLocation') {
+                addLocBtn.classList.add('tab-active');
+                homeBtn.classList.remove('tab-active');
+                homeBtn.classList.add('text-slate-500');
+                
+                addLocScreen.classList.remove('hidden');
+                homeScreen.classList.add('hidden');
+                populateFormUcDropdowns();
+            }
+        }
+
+        // Premium HTML Canvas Dynamic Graphic Image Poster Maker
+        function generateAndSharePosterImage(type, referenceKey) {
+            const canvasTitle = document.getElementById('canvasDynamicTitle');
+            const canvasBody = document.getElementById('canvasDynamicBody');
+            
+            let filename = "Qurbani-Campaign-Poster.png";
+            let textMessage = `قربانی کی کھالیں مہم 2026 - دعوتِ اسلامی کینٹ ٹاؤن راولپنڈی\n\n`;
+
+            if (type === 'location') {
+                const targetRow = sheetDataset.find(row => row["نمبر شمار"] === referenceKey);
+                if (!targetRow) return;
+
+                canvasTitle.innerText = `${targetRow["یو سی"]}`;
+                filename = `${targetRow["یو سی"]}-پوائنٹ-${referenceKey}.png`;
+
+                const address = currentLanguage === 'ur' 
+                    ? (targetRow["پوائنٹ کا ایڈریس"] || targetRow["location points"] || '')
+                    : (targetRow["location points"] || targetRow["پوائنٹ کا ایڈریس"] || '');
+
+                canvasBody.innerHTML = `
+                    <div class="text-center bg-black/20 p-3 rounded-xl border border-white/5 space-y-1">
+                        <span class="text-yellow-400 font-bold text-xs">${i18n[currentLanguage].posterAddress}</span>
+                        <p class="text-lg font-bold text-white leading-relaxed font-naskh">${address}</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 pt-2">
+                        <div class="bg-black/20 p-2.5 rounded-xl border border-white/5 text-center">
+                            <span class="text-emerald-400 text-xs font-bold block mb-1">${i18n[currentLanguage].posterRep}</span>
+                            <span class="text-sm text-slate-100 font-bold">${targetRow["پوائنٹ ذمہ دار"]}</span>
+                        </div>
+                        <div class="bg-black/20 p-2.5 rounded-xl border border-white/5 text-center">
+                            <span class="text-emerald-400 text-xs font-bold block mb-1">${i18n[currentLanguage].posterPhone}</span>
+                            <span class="text-sm font-mono text-slate-100 font-bold">${targetRow["موبائل نمبر"]}</span>
+                        </div>
+                    </div>
+                `;
+
+                textMessage += `📍 یو سی: ${targetRow["یو سی"]}\n🏠 ایڈریس: ${address}\n👤 ذمہ دار: ${targetRow["پوائنٹ ذمہ دار"]}\n📞 رابطہ نمبر: ${targetRow["موبائل نمبر"]}\n`;
+                if(targetRow["Google Map Link"]) textMessage += `🗺️ میپ لوکیشن: ${targetRow["Google Map Link"]}\n`;
+            }
+
+            showToast(i18n[currentLanguage].sharingPoster, "info");
+            const captureCanvasTarget = document.getElementById('imagePosterGeneratorCanvas');
+            
+            html2canvas(captureCanvasTarget, { scale: 2.5, backgroundColor: '#011c36' }).then(canvas => {
+                canvas.toBlob(blob => {
+                    const imgFile = new File([blob], filename, { type: 'image/png' });
+                    
+                    if (navigator.canShare && navigator.canShare({ files: [imgFile] })) {
+                        navigator.share({
+                            files: [imgFile],
+                            title: i18n[currentLanguage].title,
+                            text: textMessage
+                        })
+                        .then(() => showToast(i18n[currentLanguage].successShare))
+                        .catch(err => {
+                            console.log("Share cancelled: ", err);
+                            fallbackDownloadMechanism(canvas, filename);
+                        });
+                    } else {
+                        fallbackDownloadMechanism(canvas, filename);
+                    }
+                }, 'image/png');
+            });
+        }
+
+        // Fallback file downloader generator
+        function fallbackDownloadMechanism(canvas, name) {
+            showToast(i18n[currentLanguage].fallbackShare, "info");
+            const anchor = document.createElement('a');
+            anchor.download = name;
+            anchor.href = canvas.toDataURL('image/png');
+            document.body.appendChild(anchor);
+            anchor.click();
+            document.body.removeChild(anchor);
+        }
+
+        // Custom Toast Engine notifications rendering controller
+        function showToast(msg, type = "success") {
+            const shelf = document.getElementById('toastNotificationShelf');
+            const block = document.createElement('div');
+            block.className = `flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl border text-xs md:text-sm font-bold transition-all duration-300 transform translate-y-4 opacity-0 pointer-events-auto ${
+                type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 
+                type === 'error' ? 'bg-red-50 border-red-200 text-red-800' : 'bg-[#FAF4EE] border-[#E9D5BE] text-[#8B5A2B]'
+            }`;
+            
+            const icon = type === 'success' ? '✅' : type === 'error' ? '⚠️' : 'ℹ️';
+            block.innerHTML = `<span>${icon}</span><span class="flex-1">${msg}</span>`;
+            
+            shelf.appendChild(block);
+            setTimeout(() => block.classList.remove('translate-y-4', 'opacity-0'), 20);
+            setTimeout(() => {
+                block.classList.add('opacity-0', 'translate-y-4');
+                setTimeout(() => block.remove(), 300);
+            }, 4000);
+        }
+    </script>
+</body>
+</html>

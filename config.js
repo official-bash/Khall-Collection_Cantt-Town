@@ -1,0 +1,2 @@
+// ⚠️ CRITICAL CONFIGURATION: PASTE YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL HERE
+const API_URL = "https://script.google.com/macros/s/AKfycbzZZyhbQvgtVjzb63xKfbw3WbECRjPjzGAXk5OXWWsENueRCBhWFuEuqIP0MEsZPGA/exec";
