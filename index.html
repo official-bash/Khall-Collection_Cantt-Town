@@ -110,13 +110,19 @@
         <!-- Tab 1 Screen: Dashboard Home -->
         <div id="homeTabScreen" class="hidden space-y-6">
             
-            <!-- Beautiful Search Container -->
+            <!-- Beautiful Search Container with GPS Proximity button -->
             <div class="bg-white border border-emerald-100 rounded-2xl p-4 md:p-5 shadow-sm">
-                <div class="relative">
-                    <span class="absolute inset-y-0 right-4 flex items-center text-xl pointer-events-none">🔍</span>
-                    <input type="text" id="omniSearchInput" oninput="handleSearch()"
-                           placeholder="پوائنٹ کا نام، ذمہ دار کا نام، لوکیشن (انگلش یا اردو) سے تلاش کریں..." 
-                           class="w-full bg-[#FAF8F4]/60 border border-emerald-800/10 rounded-xl pr-12 pl-4 py-3.5 text-sm md:text-base text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#0f5132] focus:bg-white transition duration-150 shadow-inner">
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <div class="relative flex-grow">
+                        <span class="absolute inset-y-0 right-4 flex items-center text-xl pointer-events-none">🔍</span>
+                        <input type="text" id="omniSearchInput" oninput="handleSearch()"
+                               placeholder="پوائنٹ کا نام، ذمہ دار کا نام، لوکیشن (انگلش یا اردو) سے تلاش کریں..." 
+                               class="w-full bg-[#FAF8F4]/60 border border-emerald-800/10 rounded-xl pr-12 pl-4 py-3.5 text-sm md:text-base text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#0f5132] focus:bg-white transition duration-150 shadow-inner">
+                    </div>
+                    <!-- GPS Nearest Button -->
+                    <button onclick="findNearestPoints()" class="bg-[#8B5A2B] hover:bg-[#704214] text-white font-extrabold px-5 py-3.5 rounded-xl text-sm transition duration-150 flex items-center justify-center gap-2 shadow-sm whitespace-nowrap">
+                        <span>📍</span> <span id="nearestBtnLabel">قریبی لوکیشن دیکھیں</span>
+                    </button>
                 </div>
                 <div id="searchStats" class="text-xs font-bold text-clay-brown mt-2.5 mr-1 hidden"></div>
             </div>
@@ -285,6 +291,18 @@
                 searchResults: "تلاش کے نتائج",
                 foundPoints: "پوائنٹس ملے",
                 searchSummary: "کل {total} ریکارڈز میں سے {count} مماثلت پانے والے پوائنٹس تلاش کر لیے گئے ہیں۔",
+                nearestBtn: "📍 قریبی لوکیشن دیکھیں",
+                gpsAcquiring: "آپ کی لوکیشن حاصل کی جا رہی ہے...",
+                gpsError: "لوکیشن تک رسائی حاصل نہیں ہو سکی۔",
+                gpsUnsupported: "آپ کا براؤزر لوکیشن حاصل کرنے کو سپورٹ نہیں کرتا۔",
+                closestBadge: "سب سے قریبی 🌟",
+                away: "دور",
+                meters: "میٹر",
+                kilometers: "کلومیٹر",
+                nearestPointsHeader: "📍 آپ کے سب سے قریبی پوائنٹس",
+                getDirections: "🗺️ راستہ تلاش کریں",
+                gpsDenied: "ہم قریبی پوائنٹس تلاش کرنے کے لیے آپ کی لوکیشن حاصل نہیں کر سکے۔ مینوئل سرچ پر واپس جا رہے ہیں۔",
+                noCoordsPoints: "گوگل شیٹ میں کوآرڈینیٹس والا کوئی پوائنٹ نہیں ملا۔"
             },
             en: {
                 title: "Dawat-e-Islami - Cantt Town Khal Collection",
@@ -339,6 +357,18 @@
                 searchResults: "Search Results",
                 foundPoints: "Points Found",
                 searchSummary: "Found {count} matching points out of {total} total records.",
+                nearestBtn: "📍 Find Nearest Points",
+                gpsAcquiring: "Acquiring your location...",
+                gpsError: "Unable to retrieve your location.",
+                gpsUnsupported: "Geolocation is not supported by your browser.",
+                closestBadge: "Closest 🌟",
+                away: "away",
+                meters: "meters",
+                kilometers: "km",
+                nearestPointsHeader: "📍 Nearest Points to You",
+                getDirections: "🗺️ Get Directions",
+                gpsDenied: "We could not access your location to find nearest points. Reverting to manual search.",
+                noCoordsPoints: "No coordinate-based points found in the sheet."
             }
         };
 
@@ -391,6 +421,7 @@
             document.getElementById('omniSearchInput').placeholder = i18n[currentLanguage].searchPlaceholder;
             document.getElementById('ucSectionHeading').innerText = i18n[currentLanguage].ucSectionHeader;
             document.getElementById('backToUcsBtn').innerText = i18n[currentLanguage].backToUcs;
+            document.getElementById('nearestBtnLabel').innerText = i18n[currentLanguage].nearestBtn;
 
             // Form Content i18n
             document.getElementById('formTitleText').innerText = i18n[currentLanguage].formTitle;
@@ -444,13 +475,12 @@
                     sheetDataset = payload.data;
                     document.getElementById('totalPointsBadge').innerText = sheetDataset.length;
                     
-                    // Filter and compile unique list of UCs present inside Cantt Town dataset
-                    const allUcs = sheetDataset.map(row => row["یو سی"] ? row["یو سی"].trim() : "").filter(Boolean);
-                    uniqueUcsList = [...new Set(allUcs)];
+                    // Compile unique list of UCs (checks English 'uc' column if language is English)
+                    updateUcList();
 
                     // Render UI components asynchronously
                     document.getElementById('appSpinner').classList.add('hidden');
-                    switchTab('home'); // Default redirect to homepage landing setup
+                    switchTab('home');
                     renderUcCardsGrid(uniqueUcsList);
                     populateFormUcDropdowns();
                 } else {
@@ -464,13 +494,35 @@
             });
         }
 
+        // Compile unique UC list based on current language
+        function updateUcList() {
+            const allUcs = sheetDataset.map(row => {
+                if (currentLanguage === 'ur') {
+                    return row["یو سی"] ? row["یو سی"].trim() : "";
+                } else {
+                    return (row["uc"] || row["یو سی"] || "").trim();
+                }
+            }).filter(Boolean);
+            uniqueUcsList = [...new Set(allUcs)];
+        }
+
         // Render Homepage UC Category Cards UI elements
         function renderUcCardsGrid(ucs) {
             const gridContainer = document.getElementById('ucCardGrid');
             gridContainer.innerHTML = '';
 
-            ucs.forEach(ucName => {
-                const hubsCount = sheetDataset.filter(row => row["یو سی"].trim() === ucName.trim()).length;
+            // Ensure the unique list matches the language preference
+            updateUcList();
+
+            uniqueUcsList.forEach(ucName => {
+                // Calculate hubs under this specific UC (handles both English 'uc' and Urdu 'یو سی')
+                const hubsCount = sheetDataset.filter(row => {
+                    const rowUc = currentLanguage === 'ur'
+                        ? (row["یو سی"] || "")
+                        : (row["uc"] || row["یو سی"] || "");
+                    return rowUc.trim() === ucName.trim();
+                }).length;
+
                 const cardNode = document.createElement('div');
                 cardNode.className = "bg-white border border-[#E9D5BE]/60 hover:border-[#0f5132] p-5 rounded-2xl shadow-sm hover:shadow-md text-center cursor-pointer transition transform hover:-translate-y-0.5 active:scale-95 duration-150 flex flex-col justify-between items-center group interactive-card";
                 cardNode.onclick = () => handleUcCardClick(ucName);
@@ -489,7 +541,13 @@
             activeSelectedUc = ucName;
             document.getElementById('ucGridSection').classList.add('hidden');
             
-            const filteredPoints = sheetDataset.filter(row => row["یو سی"].trim() === ucName.trim());
+            // Extract the filtered points under the selected UC
+            const filteredPoints = sheetDataset.filter(row => {
+                const rowUc = currentLanguage === 'ur'
+                    ? (row["یو سی"] || "")
+                    : (row["uc"] || row["یو سی"] || "");
+                return rowUc.trim() === ucName.trim();
+            });
             document.getElementById('pointsSectionHeader').innerText = `${i18n[currentLanguage].pointsListHeader}: ${ucName}`;
             
             renderPointsListMarkup(filteredPoints);
@@ -504,8 +562,123 @@
             activeSelectedUc = null;
         }
 
+        // Parse coordinates out of standard Google Maps URLs
+        function parseCoordsFromUrl(url) {
+            if (!url) return null;
+            
+            // Pattern 1: @lat,lng
+            let match = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+            if (match) {
+                return { lat: parseFloat(match[1]), lng: parseFloat(match[2]) };
+            }
+
+            // Pattern 2: q=lat,lng or query=lat,lng
+            match = url.match(/[?&](q|query)=(-?\d+\.\d+),(-?\d+\.\d+)/);
+            if (match) {
+                return { lat: parseFloat(match[2]), lng: parseFloat(match[3]) };
+            }
+
+            // Pattern 3: any sequence of "lat,lng" floats
+            match = url.match(/(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)/);
+            if (match) {
+                const lat = parseFloat(match[1]);
+                const lng = parseFloat(match[2]);
+                if (Math.abs(lat) <= 90 && Math.abs(lng) <= 180 && lat !== 0 && lng !== 0) {
+                    return { lat, lng };
+                }
+            }
+            return null;
+        }
+
+        // Haversine Distance formula implementation
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Earth radius in km
+            const dLat = deg2rad(lat2 - lat1);
+            const dLon = deg2rad(lon2 - lon1);
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c; // Distance in kilometers
+        }
+
+        function deg2rad(deg) {
+            return deg * (Math.PI / 180);
+        }
+
+        // Geolocation Proximity Engine
+        function findNearestPoints() {
+            if (!navigator.geolocation) {
+                showToast(i18n[currentLanguage].gpsUnsupported, "error");
+                return;
+            }
+
+            showToast(i18n[currentLanguage].gpsAcquiring, "info");
+
+            navigator.geolocation.getCurrentPosition(position => {
+                const userLat = position.coords.latitude;
+                const userLng = position.coords.longitude;
+
+                // Calculate distance to all points containing coordinates
+                const pointsWithDistance = sheetDataset.map(point => {
+                    let coords = null;
+                    if (point["cordinates"]) {
+                        coords = parseCoordsFromUrl(point["cordinates"].trim());
+                    }
+                    if (!coords && point["Google Map Link"]) {
+                        coords = parseCoordsFromUrl(point["Google Map Link"].trim());
+                    }
+                    if (coords) {
+                        const distance = calculateDistance(userLat, userLng, coords.lat, coords.lng);
+                        return { ...point, distance };
+                    }
+                    return { ...point, distance: Infinity };
+                }).filter(point => point.distance !== Infinity);
+
+                if (pointsWithDistance.length === 0) {
+                    showToast(i18n[currentLanguage].noCoordsPoints, "error");
+                    return;
+                }
+
+                // Sort points by distance ascending
+                pointsWithDistance.sort((a, b) => a.distance - b.distance);
+
+                // Get top 5 closest points (3-5 points requested)
+                const nearestPoints = pointsWithDistance.slice(0, 5);
+
+                // Open points display list with nearest points
+                document.getElementById('ucGridSection').classList.add('hidden');
+                document.getElementById('pointsListSection').classList.remove('hidden');
+                document.getElementById('pointsSectionHeader').innerText = i18n[currentLanguage].nearestPointsHeader;
+
+                renderPointsListMarkup(nearestPoints, true);
+            }, error => {
+                console.error("Geolocation Error: ", error);
+                let msg = i18n[currentLanguage].gpsError;
+                if (error.code === error.PERMISSION_DENIED) {
+                    msg = i18n[currentLanguage].gpsDenied;
+                }
+                showToast(msg, "error");
+                
+                // Fall back to manual UC search
+                switchTab('home');
+                backToUcGrid();
+                
+                const searchInput = document.getElementById('omniSearchInput');
+                if (searchInput) {
+                    searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    searchInput.focus();
+                }
+            }, {
+                enableHighAccuracy: true,
+                timeout: 8000,
+                maximumAge: 0
+            });
+        }
+
         // Render localized detailed point components cards lists layout grid system
-        function renderPointsListMarkup(pointsList) {
+        function renderPointsListMarkup(pointsList, showDistance = false) {
             const listContainer = document.getElementById('pointsContainerList');
             listContainer.innerHTML = '';
 
@@ -515,25 +688,69 @@
                 return;
             }
 
-            pointsList.forEach(point => {
-                const mapLink = point["Google Map Link"] ? point["Google Map Link"].trim() : "";
+            pointsList.forEach((point, index) => {
+                let mapLink = point["Google Map Link"] ? point["Google Map Link"].trim() : "";
+                if (!mapLink && point["cordinates"]) {
+                    const cleanCoords = point["cordinates"].trim();
+                    if (/^-?\d+\.\d+\s*,\s*-?\d+\.\d+$/.test(cleanCoords)) {
+                        mapLink = "https://maps.google.com/?q=" + cleanCoords;
+                    } else if (cleanCoords.startsWith("http://") || cleanCoords.startsWith("https://")) {
+                        mapLink = cleanCoords;
+                    }
+                }
                 const cleanPhone = point["موبائل نمبر"] ? point["موبائل نمبر"].replace(/[^0-9]/g, "") : "";
                 const srNo = point["نمبر شمار"];
-                const ucName = point["یو سی"];
+                
+                // Get bilingual UC name
+                const ucName = currentLanguage === 'ur'
+                    ? (point["یو سی"] || "")
+                    : (point["uc"] || point["یو سی"] || "");
 
-                // Dynamically translate address depending on lang toggled
+                // Get bilingual Point Name
+                const pointName = currentLanguage === 'ur'
+                    ? (point["پوائنٹ کا نام"] || point["Point Name"] || `پوائنٹ #${srNo}`)
+                    : (point["Point Name"] || point["پوائنٹ کا نام"] || `Point #${srNo}`);
+
+                // Get bilingual Point Responsible
+                const responsiblePerson = currentLanguage === 'ur'
+                    ? (point["پوائنٹ ذمہ دار"] || "")
+                    : (point["Point responsible"] || point["پوائنٹ ذمہ دار"] || "");
+
+                // Get bilingual Point Address
                 const address = currentLanguage === 'ur' 
                     ? (point["پوائنٹ کا ایڈریس"] || point["location points"] || '') 
                     : (point["location points"] || point["پوائنٹ کا ایڈریس"] || '');
+
+                // Setup dynamic distance badges
+                let distanceBadgeMarkup = '';
+                if (showDistance && point.distance !== undefined && point.distance !== Infinity) {
+                    const isClosest = index === 0;
+                    const badgeBg = isClosest ? 'bg-amber-100 border-amber-300 text-amber-950 font-black' : 'bg-emerald-50 border-emerald-200 text-emerald-800';
+                    const badgeText = isClosest ? `${i18n[currentLanguage].closestBadge} | ` : '';
+                    
+                    let distanceStr = '';
+                    if (point.distance < 1) {
+                        const meters = Math.round(point.distance * 1000);
+                        distanceStr = `${meters} ${i18n[currentLanguage].meters}`;
+                    } else {
+                        distanceStr = `${point.distance.toFixed(1)} ${i18n[currentLanguage].kilometers}`;
+                    }
+                    
+                    distanceBadgeMarkup = `
+                        <span class="${badgeBg} px-2.5 py-1 rounded-lg text-[10px] md:text-xs border flex items-center gap-1 shadow-sm">
+                            📍 ${badgeText} ${distanceStr} ${i18n[currentLanguage].away}
+                        </span>`;
+                }
 
                 const pointCard = document.createElement('div');
                 pointCard.className = "bg-white border border-[#E9D5BE]/50 rounded-2xl p-5 shadow-sm hover:shadow-md flex flex-col justify-between space-y-4 hover:border-[#0f5132]/30 transition duration-150 interactive-card";
                 
                 let mapBtnMarkup = '';
                 if (mapLink) {
+                    const mapBtnText = i18n[currentLanguage].getDirections || i18n[currentLanguage].mapBtn;
                     mapBtnMarkup = `
                         <a href="${mapLink}" target="_blank" class="flex-1 py-2.5 px-3 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 font-extrabold rounded-xl text-xs transition duration-150 flex items-center justify-center gap-1.5 shadow-sm">
-                            <span>🗺️</span> ${i18n[currentLanguage].mapBtn}
+                            <span>🗺️</span> ${mapBtnText}
                         </a>`;
                 } else {
                     mapBtnMarkup = `
@@ -544,16 +761,23 @@
 
                 pointCard.innerHTML = `
                     <div class="space-y-3">
-                        <div class="flex justify-between items-center gap-2">
-                            <span class="bg-emerald-50 text-[#0f5132] px-2.5 py-1 rounded-lg text-xs font-extrabold border border-emerald-100 shadow-sm">${i18n[currentLanguage].serial} #${srNo}</span>
-                            <span class="text-[11px] font-extrabold text-clay-brown">${point["location points"] && currentLanguage === 'ur' ? point["location points"] : ''}</span>
+                        <div class="flex justify-between items-center gap-2 flex-wrap">
+                            <div class="flex items-center gap-1.5">
+                                <span class="bg-emerald-50 text-[#0f5132] px-2.5 py-1 rounded-lg text-xs font-extrabold border border-emerald-100 shadow-sm">${i18n[currentLanguage].serial} #${srNo}</span>
+                                <span class="text-[10px] font-extrabold bg-[#FAF4EE] px-2 py-1 rounded text-clay-brown border border-[#E9D5BE]/30">${ucName}</span>
+                            </div>
+                            ${distanceBadgeMarkup}
                         </div>
-                        <h4 class="text-base font-extrabold text-slate-800 leading-snug">${address}</h4>
+                        <h4 class="text-base font-extrabold text-[#0f5132] leading-snug">${pointName}</h4>
                         
                         <div class="bg-[#FAF8F4] p-3 rounded-xl border border-slate-100 text-xs text-slate-600 space-y-1.5">
+                            <p class="flex items-start gap-1.5">
+                                <span class="text-[#0f5132] font-extrabold shrink-0">${currentLanguage === 'ur' ? 'پتہ:' : 'Address:'}</span> 
+                                <span class="font-semibold text-slate-800">${address}</span>
+                            </p>
                             <p class="flex items-center gap-1.5">
                                 <span class="text-[#0f5132] font-extrabold">${i18n[currentLanguage].responsible}:</span> 
-                                <span class="font-bold text-slate-800">${point["پوائنٹ ذمہ دار"]}</span>
+                                <span class="font-bold text-slate-800">${responsiblePerson}</span>
                             </p>
                             <p class="flex items-center gap-1.5" dir="ltr">
                                 <span class="text-[#0f5132] font-extrabold">📞 :</span>
@@ -597,12 +821,16 @@
                 const addressUrdu = (row["پوائنٹ کا ایڈریس"] || "").toLowerCase();
                 const addressEnglish = (row["location points"] || "").toLowerCase();
                 const zimadarName = (row["پوائنٹ ذمہ دار"] || "").toLowerCase();
+                const zimadarNameEnglish = (row["Point responsible"] || "").toLowerCase();
                 const ucCell = (row["یو سی"] || "").toLowerCase();
+                const ucCellEnglish = (row["uc"] || "").toLowerCase();
                 
                 return addressUrdu.includes(query) || 
                        addressEnglish.includes(query) || 
                        zimadarName.includes(query) ||
-                       ucCell.includes(query);
+                       zimadarNameEnglish.includes(query) ||
+                       ucCell.includes(query) ||
+                       ucCellEnglish.includes(query);
             });
 
             document.getElementById('ucGridSection').classList.add('hidden');
@@ -650,8 +878,12 @@
             if (!selectedUc) return;
 
             const missingMapPoints = sheetDataset.filter(row => {
-                const isMatch = row["یو سی"].trim() === selectedUc.trim();
-                const hasNoMap = !row["Google Map Link"] || row["Google Map Link"].trim() === "";
+                const rowUc = currentLanguage === 'ur'
+                    ? (row["یو سی"] || "")
+                    : (row["uc"] || row["یو سی"] || "");
+                const isMatch = rowUc.trim() === selectedUc.trim();
+                const hasNoMap = (!row["Google Map Link"] || row["Google Map Link"].trim() === "") && 
+                                 (!row["cordinates"] || row["cordinates"].trim() === "");
                 return isMatch && hasNoMap;
             });
 
@@ -675,17 +907,34 @@
         function submitLocationUpdate() {
             const uc = document.getElementById('formUcSelect').value;
             const srNo = document.getElementById('formSrNoSelect').value;
-            const mapLink = document.getElementById('formMapUrlInput').value.trim();
+            const userInput = document.getElementById('formMapUrlInput').value.trim();
             const password = document.getElementById('formPasswordInput').value.trim();
 
-            if (!uc || !srNo || !mapLink || !password) {
+            if (!uc || !srNo || !userInput || !password) {
                 showToast(i18n[currentLanguage].toastAllFields, "error");
                 return;
             }
 
-            if (!mapLink.startsWith("http://") && !mapLink.startsWith("https://")) {
+            const isRawCoords = /^-?\d+\.\d+\s*,\s*-?\d+\.\d+$/.test(userInput);
+            const isUrl = userInput.startsWith("http://") || userInput.startsWith("https://");
+
+            if (!isRawCoords && !isUrl) {
                 showToast(i18n[currentLanguage].toastValidUrl, "error");
                 return;
+            }
+
+            let mapLinkParam = "";
+            let cordinatesParam = "";
+
+            if (isRawCoords) {
+                cordinatesParam = userInput;
+                mapLinkParam = "https://maps.google.com/?q=" + userInput;
+            } else {
+                mapLinkParam = userInput;
+                const parsed = parseCoordsFromUrl(userInput);
+                if (parsed) {
+                    cordinatesParam = `${parsed.lat},${parsed.lng}`;
+                }
             }
 
             document.getElementById('appSpinner').classList.remove('hidden');
@@ -696,7 +945,8 @@
                 + "?action=updateLocation"
                 + "&uc=" + encodeURIComponent(uc)
                 + "&srNo=" + encodeURIComponent(srNo)
-                + "&mapLink=" + encodeURIComponent(mapLink)
+                + "&mapLink=" + encodeURIComponent(mapLinkParam)
+                + "&cordinates=" + encodeURIComponent(cordinatesParam)
                 + "&password=" + encodeURIComponent(password);
 
             fetch(updateUrl)
@@ -773,6 +1023,10 @@
                     ? (targetRow["پوائنٹ کا ایڈریس"] || targetRow["location points"] || '')
                     : (targetRow["location points"] || targetRow["پوائنٹ کا ایڈریس"] || '');
 
+                const responsiblePerson = currentLanguage === 'ur'
+                    ? (targetRow["پوائنٹ ذمہ دار"] || "")
+                    : (targetRow["Point responsible"] || targetRow["پوائنٹ ذمہ دار"] || "");
+
                 canvasBody.innerHTML = `
                     <div class="text-center bg-black/20 p-3 rounded-xl border border-white/5 space-y-1">
                         <span class="text-yellow-400 font-bold text-xs">${i18n[currentLanguage].posterAddress}</span>
@@ -781,7 +1035,7 @@
                     <div class="grid grid-cols-2 gap-2 pt-2">
                         <div class="bg-black/20 p-2.5 rounded-xl border border-white/5 text-center">
                             <span class="text-emerald-400 text-xs font-bold block mb-1">${i18n[currentLanguage].posterRep}</span>
-                            <span class="text-sm text-slate-100 font-bold">${targetRow["پوائنٹ ذمہ دار"]}</span>
+                            <span class="text-sm text-slate-100 font-bold">${responsiblePerson}</span>
                         </div>
                         <div class="bg-black/20 p-2.5 rounded-xl border border-white/5 text-center">
                             <span class="text-emerald-400 text-xs font-bold block mb-1">${i18n[currentLanguage].posterPhone}</span>
@@ -790,8 +1044,17 @@
                     </div>
                 `;
 
-                textMessage += `📍 یو سی: ${targetRow["یو سی"]}\n🏠 ایڈریس: ${address}\n👤 ذمہ دار: ${targetRow["پوائنٹ ذمہ دار"]}\n📞 رابطہ نمبر: ${targetRow["موبائل نمبر"]}\n`;
-                if(targetRow["Google Map Link"]) textMessage += `🗺️ میپ لوکیشن: ${targetRow["Google Map Link"]}\n`;
+                let sharedMapLink = targetRow["Google Map Link"] ? targetRow["Google Map Link"].trim() : "";
+                if (!sharedMapLink && targetRow["cordinates"]) {
+                    const cleanCoords = targetRow["cordinates"].trim();
+                    if (/^-?\d+\.\d+\s*,\s*-?\d+\.\d+$/.test(cleanCoords)) {
+                        sharedMapLink = "https://maps.google.com/?q=" + cleanCoords;
+                    } else if (cleanCoords.startsWith("http://") || cleanCoords.startsWith("https://")) {
+                        sharedMapLink = cleanCoords;
+                    }
+                }
+                textMessage += `📍 یو سی: ${targetRow["یو سی"]}\n🏠 ایڈریس: ${address}\n👤 ذمہ دار: ${responsiblePerson}\n📞 رابطہ نمبر: ${targetRow["موبائل نمبر"]}\n`;
+                if(sharedMapLink) textMessage += `🗺️ میپ لوکیشن: ${sharedMapLink}\n`;
             }
 
             showToast(i18n[currentLanguage].sharingPoster, "info");
