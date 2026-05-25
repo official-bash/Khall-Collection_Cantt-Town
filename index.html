@@ -87,17 +87,7 @@
         </div>
     </header>
 
-    <!-- Navigation Tabs Menu -->
-    <nav class="max-w-md mx-auto w-full px-4 mt-6">
-        <div class="bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm flex gap-2">
-            <button id="homeTabBtn" onclick="switchTab('home')" class="flex-1 py-3 px-4 rounded-xl text-sm font-extrabold transition duration-200 flex items-center justify-center gap-2 tab-active">
-                <span id="homeTabLabel">🏠 ہوم پیج</span>
-            </button>
-            <button id="addLocTabBtn" onclick="switchTab('addLocation')" class="flex-1 py-3 px-4 rounded-xl text-sm font-extrabold text-slate-500 hover:text-[#8B5A2B] hover:bg-[#FAF4EE]/50 transition duration-200 flex items-center justify-center gap-2">
-                <span id="addLocTabLabel">📍 لوکیشن شامل کریں</span>
-            </button>
-        </div>
-    </nav>
+
 
     <!-- Main Workspace -->
     <main class="max-w-6xl w-full mx-auto px-4 py-6 flex-grow">
@@ -315,7 +305,7 @@
                 configError: "ایپ کنفگریشن ایرر: Apps Script کا درست URL لنک نہیں مل سکا۔",
                 connectionError: "ڈیٹا کنکشن میں خرابی آئی ہے۔ برائے مہربانی پیج ریفریش کریں۔",
                 toastAllFields: "براہ کرم فارم کے تمام خانے درست تفصیلات سے پُر کریں!",
-                toastValidUrl: "براہ کرم درست گوگل میپ یو آر ایل یا کوآرڈینیٹس (lat, lng) درج کریں!","
+                toastValidUrl: "براہ کرم درست گوگل میپ یو آر ایل یا کوآرڈینیٹس (lat, lng) درج کریں!",
                 toastAutoSelected: "یو سی اور سیریل نمبر خودکار طور پر فارم میں منتخب کر لیے گئے ہیں۔",
                 toastUpdated: "لوکیشن لنک کامیابی سے اپڈیٹ کر دیا گیا ہے!",
                 allPointsUpdated: "🎉 اس یو سی کے تمام پوائنٹس پہلے ہی اپڈیٹڈ ہیں!",
@@ -468,8 +458,6 @@
             document.getElementById('headerTitle').innerText = i18n[currentLanguage].dashboardTitle;
             document.getElementById('headerSub').innerText = i18n[currentLanguage].townName;
             document.getElementById('totalPointsLabel').innerText = i18n[currentLanguage].totalPoints + ": ";
-            document.getElementById('homeTabLabel').innerText = i18n[currentLanguage].homeTab;
-            document.getElementById('addLocTabLabel').innerText = i18n[currentLanguage].addLocationTab;
             document.getElementById('spinnerLoadingText').innerText = i18n[currentLanguage].loading;
 
             // Search Bar i18n
@@ -523,9 +511,24 @@
 
             const url = API_URL + "?action=getData";
 
-            fetch(url)
-            .then(response => response.json())
-            .then(payload => {
+            fetch(url, { redirect: 'follow' })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("HTTP error: " + response.status);
+                }
+                return response.text();
+            })
+            .then(text => {
+                // Google Apps Script may return HTML on error (e.g., auth page).
+                // Try to parse as JSON; if it fails, show a clear error.
+                let payload;
+                try {
+                    payload = JSON.parse(text);
+                } catch (parseErr) {
+                    console.error("JSON Parse Error. Raw response:", text.substring(0, 500));
+                    throw new Error("سرور سے غیر متوقع جواب آیا۔ براہ کرم Apps Script دوبارہ Deploy کریں۔ / Unexpected response from server. Please re-deploy Apps Script.");
+                }
+
                 if(payload.status === "success") {
                     sheetDataset = payload.data;
                     document.getElementById('totalPointsBadge').innerText = sheetDataset.length;
@@ -539,13 +542,13 @@
                     renderUcCardsGrid(uniqueUcsList);
                     populateFormUcDropdowns();
                 } else {
-                    throw new Error(payload.message);
+                    throw new Error(payload.message || "Unknown error from Apps Script");
                 }
             })
             .catch(err => {
                 console.error("Critical Fetch Error: ", err);
                 showToast(i18n[currentLanguage].connectionError, "error");
-                document.getElementById('appSpinner').innerHTML = `<p class="text-red-600 font-bold p-4 bg-red-50 rounded-xl border border-red-100">${i18n[currentLanguage].connectionError}</p>`;
+                document.getElementById('appSpinner').innerHTML = `<p class="text-red-600 font-bold p-4 bg-red-50 rounded-xl border border-red-100">${err.message || i18n[currentLanguage].connectionError}</p>`;
             });
         }
 
@@ -970,6 +973,16 @@
                 return;
             }
 
+            // Find the selected point row in our dataset using unique Serial Number
+            const targetPoint = sheetDataset.find(row => String(row["نمبر شمار"]) === String(srNo));
+            if (!targetPoint) {
+                showToast("پوائنٹ نہیں ملا / Point not found", "error");
+                return;
+            }
+
+            // Always send the canonical Urdu UC name to the Apps Script to match the spreadsheet cell exactly
+            const canonicalUc = targetPoint["یو سی"] || uc;
+
             const isRawCoords = /^-?\d+\.\d+\s*,\s*-?\d+\.\d+$/.test(userInput);
             const isUrl = userInput.startsWith("http://") || userInput.startsWith("https://");
 
@@ -998,15 +1011,25 @@
             // Constructing clean query params for GET request
             const updateUrl = API_URL
                 + "?action=updateLocation"
-                + "&uc=" + encodeURIComponent(uc)
+                + "&uc=" + encodeURIComponent(canonicalUc)
                 + "&srNo=" + encodeURIComponent(srNo)
                 + "&mapLink=" + encodeURIComponent(mapLinkParam)
                 + "&cordinates=" + encodeURIComponent(cordinatesParam)
                 + "&password=" + encodeURIComponent(password);
 
-            fetch(updateUrl)
-            .then(res => res.json())
-            .then(response => {
+            fetch(updateUrl, { redirect: 'follow' })
+            .then(res => {
+                if (!res.ok) throw new Error("HTTP error: " + res.status);
+                return res.text();
+            })
+            .then(text => {
+                let response;
+                try {
+                    response = JSON.parse(text);
+                } catch (e) {
+                    console.error("JSON Parse Error on update. Raw:", text.substring(0, 500));
+                    throw new Error("سرور سے غیر متوقع جواب آیا۔ / Unexpected server response.");
+                }
                 document.getElementById('appSpinner').classList.add('hidden');
                 document.getElementById('addLocationTabScreen').classList.remove('opacity-40', 'pointer-events-none');
 
@@ -1016,7 +1039,7 @@
                     document.getElementById('formPasswordInput').value = '';
                     fetchDatasetFromGoogleSheet();
                 } else {
-                    showToast(response.message, "error");
+                    showToast(response.message || "اپڈیٹ کرنے میں خرابی آئی ہے / Error updating location", "error");
                 }
             })
             .catch(err => {
@@ -1029,16 +1052,19 @@
 
         // Tab viewport layout context swapper
         function switchTab(target) {
-            const homeBtn = document.getElementById('homeTabBtn');
-            const addLocBtn = document.getElementById('addLocTabBtn');
             const homeScreen = document.getElementById('homeTabScreen');
             const addLocScreen = document.getElementById('addLocationTabScreen');
 
+            // Bottom navbar highlight
+            const navHome = document.getElementById('navHomeBtn');
+            const navNearest = document.getElementById('navNearestBtn');
+            const navAdd = document.getElementById('navAddBtn');
+            if (navHome) navHome.classList.remove('text-[#0f5132]', 'font-extrabold');
+            if (navNearest) navNearest.classList.remove('text-[#0f5132]', 'font-extrabold');
+            if (navAdd) navAdd.classList.remove('text-[#0f5132]', 'font-extrabold');
+
             if (target === 'home') {
-                homeBtn.classList.add('tab-active');
-                addLocBtn.classList.remove('tab-active');
-                addLocBtn.classList.add('text-slate-500');
-                
+                if (navHome) navHome.classList.add('text-[#0f5132]', 'font-extrabold');
                 homeScreen.classList.remove('hidden');
                 addLocScreen.classList.add('hidden');
                 if (activeSelectedUc) {
@@ -1049,10 +1075,7 @@
                     document.getElementById('pointsListSection').classList.add('hidden');
                 }
             } else if (target === 'addLocation') {
-                addLocBtn.classList.add('tab-active');
-                homeBtn.classList.remove('tab-active');
-                homeBtn.classList.add('text-slate-500');
-                
+                if (navAdd) navAdd.classList.add('text-[#0f5132]', 'font-extrabold');
                 addLocScreen.classList.remove('hidden');
                 homeScreen.classList.add('hidden');
                 populateFormUcDropdowns();
@@ -1185,25 +1208,20 @@
 
             const srNo = targetRow["نمبر شمار"];
             
-            // Get bilingual UC name
-            const ucName = currentLanguage === 'ur'
-                ? (targetRow["یو سی"] || "")
-                : (targetRow["uc"] || targetRow["یو سی"] || "");
+            // Strictly single-language values — no cross-language fallback
+            let ucName, pointName, address, responsiblePerson;
 
-            // Get bilingual Point Name
-            const pointName = currentLanguage === 'ur'
-                ? (targetRow["پوائنٹ کا نام"] || targetRow["Point Name"] || `پوائنٹ #${srNo}`)
-                : (targetRow["Point Name"] || targetRow["پوائنٹ کا نام"] || `Point #${srNo}`);
-
-            // Get bilingual Point Address
-            const address = currentLanguage === 'ur' 
-                ? (targetRow["پوائنٹ کا ایڈریس"] || targetRow["location points"] || '') 
-                : (targetRow["location points"] || targetRow["پوائنٹ کا ایڈریس"] || '');
-
-            // Get bilingual Point Responsible
-            const responsiblePerson = currentLanguage === 'ur'
-                ? (targetRow["پوائنٹ ذمہ دار"] || "")
-                : (targetRow["Point responsible"] || targetRow["پوائنٹ ذمہ دار"] || "");
+            if (currentLanguage === 'ur') {
+                ucName = targetRow["یو سی"] || "";
+                pointName = targetRow["پوائنٹ کا نام"] || `پوائنٹ #${srNo}`;
+                address = targetRow["پوائنٹ کا ایڈریس"] || "";
+                responsiblePerson = targetRow["پوائنٹ ذمہ دار"] || "";
+            } else {
+                ucName = targetRow["uc"] || "";
+                pointName = targetRow["Point Name"] || `Point #${srNo}`;
+                address = targetRow["location points"] || "";
+                responsiblePerson = targetRow["Point responsible"] || "";
+            }
 
             // Setup map link fallback
             let sharedMapLink = targetRow["Google Map Link"] ? targetRow["Google Map Link"].trim() : "";
