@@ -226,6 +226,44 @@
                 <div id="posterFooterText" class="bg-black/30 py-1.5 text-center text-[10px] text-slate-400 border-t border-white/5">
                     کینٹ ٹاؤن راولپنڈی مہم ڈیش بورڈ پینل
                 </div>
+    </div>
+
+    <!-- Beautiful Share Options Modal -->
+    <div id="shareOptionsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300 pointer-events-auto">
+        <div class="bg-white rounded-3xl border border-emerald-100 p-6 md:p-8 max-w-sm w-full shadow-2xl transform scale-95 transition-transform duration-300 space-y-6 relative overflow-hidden">
+            <div class="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-[#8B5A2B] via-[#0f5132] to-amber-500"></div>
+            
+            <button onclick="closeShareModal()" class="absolute top-4 left-4 text-slate-400 hover:text-slate-600 transition text-lg p-1.5 bg-slate-50 hover:bg-slate-100 rounded-full w-8 h-8 flex items-center justify-center font-bold">×</button>
+            
+            <div class="text-center space-y-2 pt-2">
+                <h3 id="shareModalTitle" class="text-lg font-extrabold text-[#0f5132]">📢 شیئرنگ آپشنز</h3>
+                <p id="shareModalDesc" class="text-xs font-bold text-slate-500">براہ کرم منتخب کریں کہ آپ اسے کیسے شیئر کرنا چاہتے ہیں:</p>
+            </div>
+
+            <div class="space-y-3.5">
+                <!-- Option 1: Poster Image -->
+                <button onclick="handleShareOption('poster')" class="w-full bg-[#FAF4EE] hover:bg-[#F3E6D5] text-[#8B5A2B] border border-[#E9D5BE] p-4 rounded-2xl transition duration-200 text-right flex items-center justify-between group shadow-sm hover:shadow-md">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center text-xl group-hover:bg-[#8B5A2B] group-hover:text-white transition duration-150">🖼️</div>
+                        <div class="text-right">
+                            <span id="shareOptPosterTitle" class="block text-sm font-extrabold text-[#8B5A2B]">تصویری پوسٹر (Image Poster)</span>
+                            <span id="shareOptPosterDesc" class="block text-[10px] font-bold text-slate-500 mt-0.5">پوائنٹ کارڈ کی خوبصورت تصویر تیار کریں</span>
+                        </div>
+                    </div>
+                    <span class="text-lg text-[#8B5A2B]/60 group-hover:translate-x-[-4px] transition transform">←</span>
+                </button>
+
+                <!-- Option 2: Text Post -->
+                <button onclick="handleShareOption('text')" class="w-full bg-emerald-50/50 hover:bg-emerald-50 text-[#0f5132] border border-emerald-100 p-4 rounded-2xl transition duration-200 text-right flex items-center justify-between group shadow-sm hover:shadow-md">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center text-xl group-hover:bg-[#0f5132] group-hover:text-white transition duration-150">✍️</div>
+                        <div class="text-right">
+                            <span id="shareOptTextTitle" class="block text-sm font-extrabold text-[#0f5132]">تحریری پیغام (Text Post)</span>
+                            <span id="shareOptTextDesc" class="block text-[10px] font-bold text-slate-500 mt-0.5">کاپی اور شیئر کرنے کے لیے تحریری پیغام</span>
+                        </div>
+                    </div>
+                    <span class="text-lg text-[#0f5132]/60 group-hover:translate-x-[-4px] transition transform">←</span>
+                </button>
             </div>
         </div>
     </div>
@@ -302,7 +340,14 @@
                 nearestPointsHeader: "📍 آپ کے سب سے قریبی پوائنٹس",
                 getDirections: "🗺️ راستہ تلاش کریں",
                 gpsDenied: "ہم قریبی پوائنٹس تلاش کرنے کے لیے آپ کی لوکیشن حاصل نہیں کر سکے۔ مینوئل سرچ پر واپس جا رہے ہیں۔",
-                noCoordsPoints: "گوگل شیٹ میں کوآرڈینیٹس والا کوئی پوائنٹ نہیں ملا۔"
+                noCoordsPoints: "گوگل شیٹ میں کوآرڈینیٹس والا کوئی پوائنٹ نہیں ملا۔",
+                shareModalTitle: "📢 شیئرنگ آپشنز",
+                shareModalDesc: "براہ کرم منتخب کریں کہ آپ اسے کیسے شیئر کرنا چاہتے ہیں:",
+                shareOptPosterTitle: "تصویری پوسٹر (Image Poster)",
+                shareOptPosterDesc: "پوائنٹ کارڈ کی خوبصورت تصویر تیار کریں",
+                shareOptTextTitle: "تحریری پیغام (Text Post)",
+                shareOptTextDesc: "کاپی اور شیئر کرنے کے لیے تحریری پیغام",
+                textCopied: "تحریری پیغام کامیابی سے کاپی کر لیا گیا ہے!"
             },
             en: {
                 title: "Dawat-e-Islami - Cantt Town Khal Collection",
@@ -368,7 +413,14 @@
                 nearestPointsHeader: "📍 Nearest Points to You",
                 getDirections: "🗺️ Get Directions",
                 gpsDenied: "We could not access your location to find nearest points. Reverting to manual search.",
-                noCoordsPoints: "No coordinate-based points found in the sheet."
+                noCoordsPoints: "No coordinate-based points found in the sheet.",
+                shareModalTitle: "📢 Sharing Options",
+                shareModalDesc: "Please select how you would like to share this location:",
+                shareOptPosterTitle: "Poster Image",
+                shareOptPosterDesc: "Generate a beautiful image poster of the point",
+                shareOptTextTitle: "Text Message",
+                shareOptTextDesc: "Copy or share a formatted text message post",
+                textCopied: "Text post copied to clipboard successfully!"
             }
         };
 
@@ -791,7 +843,7 @@
                         <a href="https://wa.me/${cleanPhone}" target="_blank" class="flex-1 py-2.5 px-3 bg-emerald-700 hover:bg-[#0f5132] border border-[#0f5132] text-white font-extrabold rounded-xl text-xs transition duration-150 flex items-center justify-center gap-1.5 shadow-sm">
                             <span>💬</span> ${i18n[currentLanguage].whatsappBtn}
                         </a>
-                        <button onclick="generateAndSharePosterImage('location', '${point["نمبر شمار"]}')" class="p-2.5 bg-[#FAF4EE] hover:bg-[#F3E6D5] border border-[#E9D5BE] text-[#8B5A2B] rounded-xl text-xs font-extrabold transition duration-150 shadow-sm" title="${i18n[currentLanguage].shareBtn}">
+                        <button onclick="openShareModal('${point["نمبر شمار"]}')" class="p-2.5 bg-[#FAF4EE] hover:bg-[#F3E6D5] border border-[#E9D5BE] text-[#8B5A2B] rounded-xl text-xs font-extrabold transition duration-150 shadow-sm" title="${i18n[currentLanguage].shareBtn}">
                             <span>📢</span>
                         </button>
                     </div>
@@ -1079,6 +1131,145 @@
                         fallbackDownloadMechanism(canvas, filename);
                     }
                 }, 'image/png');
+            });
+        }
+
+        // Modal and Text Sharing options controllers
+        let activeShareReferenceKey = null;
+
+        function openShareModal(referenceKey) {
+            activeShareReferenceKey = referenceKey;
+            
+            // Apply current language translations
+            document.getElementById('shareModalTitle').innerText = i18n[currentLanguage].shareModalTitle;
+            document.getElementById('shareModalDesc').innerText = i18n[currentLanguage].shareModalDesc;
+            document.getElementById('shareOptPosterTitle').innerText = i18n[currentLanguage].shareOptPosterTitle;
+            document.getElementById('shareOptPosterDesc').innerText = i18n[currentLanguage].shareOptPosterDesc;
+            document.getElementById('shareOptTextTitle').innerText = i18n[currentLanguage].shareOptTextTitle;
+            document.getElementById('shareOptTextDesc').innerText = i18n[currentLanguage].shareOptTextDesc;
+
+            const modal = document.getElementById('shareOptionsModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.querySelector('div').classList.remove('scale-95');
+            }, 20);
+        }
+
+        function closeShareModal() {
+            const modal = document.getElementById('shareOptionsModal');
+            modal.classList.add('opacity-0');
+            modal.querySelector('div').classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function handleShareOption(option) {
+            closeShareModal();
+            if (option === 'poster') {
+                generateAndSharePosterImage('location', activeShareReferenceKey);
+            } else if (option === 'text') {
+                shareTextMessage(activeShareReferenceKey);
+            }
+        }
+
+        function shareTextMessage(referenceKey) {
+            const targetRow = sheetDataset.find(row => row["نمبر شمار"] === referenceKey);
+            if (!targetRow) return;
+
+            const srNo = targetRow["نمبر شمار"];
+            
+            // Get bilingual UC name
+            const ucName = currentLanguage === 'ur'
+                ? (targetRow["یو سی"] || "")
+                : (targetRow["uc"] || targetRow["یو سی"] || "");
+
+            // Get bilingual Point Name
+            const pointName = currentLanguage === 'ur'
+                ? (targetRow["پوائنٹ کا نام"] || targetRow["Point Name"] || `پوائنٹ #${srNo}`)
+                : (targetRow["Point Name"] || targetRow["پوائنٹ کا نام"] || `Point #${srNo}`);
+
+            // Get bilingual Point Address
+            const address = currentLanguage === 'ur' 
+                ? (targetRow["پوائنٹ کا ایڈریس"] || targetRow["location points"] || '') 
+                : (targetRow["location points"] || targetRow["پوائنٹ کا ایڈریس"] || '');
+
+            // Get bilingual Point Responsible
+            const responsiblePerson = currentLanguage === 'ur'
+                ? (targetRow["پوائنٹ ذمہ دار"] || "")
+                : (targetRow["Point responsible"] || targetRow["پوائنٹ ذمہ دار"] || "");
+
+            // Setup map link fallback
+            let sharedMapLink = targetRow["Google Map Link"] ? targetRow["Google Map Link"].trim() : "";
+            if (!sharedMapLink && targetRow["cordinates"]) {
+                const cleanCoords = targetRow["cordinates"].trim();
+                if (/^-?\d+\.\d+\s*,\s*-?\d+\.\d+$/.test(cleanCoords)) {
+                    sharedMapLink = "https://maps.google.com/?q=" + cleanCoords;
+                } else if (cleanCoords.startsWith("http://") || cleanCoords.startsWith("https://")) {
+                    sharedMapLink = cleanCoords;
+                }
+            }
+
+            // Create beautifully formatted bilingually-tailored Text Message
+            let headingText = "";
+            let subheadingText = "";
+            let brandText = "";
+            let callToActionText = "";
+
+            if (currentLanguage === 'ur') {
+                headingText = "قربانی کی کھالیں";
+                subheadingText = "عاشقانِ رسول کی دینی تحریک";
+                brandText = "دعوتِ اسلامی";
+                callToActionText = "کو دے کر دینی کاموں میں حصہ لیجیے!";
+            } else {
+                headingText = "Qurbani Hides";
+                subheadingText = "Religious Movement of Ashiqan-e-Rasool";
+                brandText = "Dawat-e-Islami";
+                callToActionText = "Donate your hides and participate in religious work!";
+            }
+
+            let textMessage = `🌟 *${headingText}* 🌟\n✨ *${subheadingText}* ✨\n🕌 *${brandText}* 🕌\n📢 *${callToActionText}*\n\n`;
+
+            if (currentLanguage === 'ur') {
+                textMessage += `📍 *لوکیشن نمبر (نمبر شمار):* ${srNo}\n`;
+                textMessage += `🏢 *پوائنٹ کا نام:* ${pointName}\n`;
+                textMessage += `🏢 *یو سی (UC):* ${ucName}\n`;
+                textMessage += `🏠 *پتہ:* ${address}\n`;
+                textMessage += `👤 *ذمہ دار:* ${responsiblePerson}\n`;
+                textMessage += `📞 *رابطہ نمبر:* ${targetRow["موبائل نمبر"]}\n`;
+                if(sharedMapLink) textMessage += `🗺️ *گوگل میپ لوکیشن:* ${sharedMapLink}\n`;
+            } else {
+                textMessage += `📍 *Point Serial / Number:* ${srNo}\n`;
+                textMessage += `🏢 *Point Name:* ${pointName}\n`;
+                textMessage += `🏢 *Union Council (UC):* ${ucName}\n`;
+                textMessage += `🏠 *Address:* ${address}\n`;
+                textMessage += `👤 *Person in Charge:* ${responsiblePerson}\n`;
+                textMessage += `📞 *Mobile Number:* ${targetRow["موبائل نمبر"]}\n`;
+                if(sharedMapLink) textMessage += `🗺️ *Google Map Link:* ${sharedMapLink}\n`;
+            }
+
+            // Direct Clipboard write + Share API
+            if (navigator.share) {
+                navigator.share({
+                    title: i18n[currentLanguage].title,
+                    text: textMessage
+                })
+                .then(() => showToast(i18n[currentLanguage].successShare))
+                .catch(err => {
+                    console.log("Direct share failed, falling back to clipboard", err);
+                    copyTextToClipboard(textMessage);
+                });
+            } else {
+                copyTextToClipboard(textMessage);
+            }
+        }
+
+        function copyTextToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(i18n[currentLanguage].textCopied, "success");
+            }).catch(err => {
+                console.error("Clipboard copy failed", err);
             });
         }
 
