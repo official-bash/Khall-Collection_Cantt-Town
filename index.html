@@ -287,13 +287,23 @@
                 </div>
 
                 <div class="modal-options">
-                    <!-- Share Language Selection -->
-                    <div style="width: 100%; margin-bottom: 16px; background: var(--bg-body); padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
-                        <label id="shareLangSelectLabel" class="form-label" style="display: block; margin-bottom: 8px; font-weight: 800; color: var(--clr-primary);">Select Share Language / شیئر کی زبان منتخب کریں:</label>
-                        <select id="shareLanguageSelect" class="form-select" style="width: 100%; border-color: rgba(15,81,50,0.15); font-weight: bold;">
-                            <option value="ur">اردو (Urdu)</option>
-                            <option value="en">English</option>
-                        </select>
+                    <!-- Small Modern Language Toggle -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-body); padding: 10px 16px; border-radius: 14px; border: 1px solid var(--border-subtle); margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                        <span style="font-size: 13px; font-weight: 800; color: var(--clr-primary);">Share Language</span>
+                        <style>
+                            input[name="shareLangToggle"]:checked + label {
+                                background: var(--clr-primary);
+                                color: white !important;
+                                box-shadow: 0 2px 4px rgba(15,81,50,0.2);
+                            }
+                        </style>
+                        <div style="display: flex; background: var(--bg-surface); border-radius: 20px; padding: 3px; border: 1px solid var(--border-subtle);">
+                            <input type="radio" id="shareLangUr" name="shareLangToggle" value="ur" style="display: none;">
+                            <label for="shareLangUr" style="margin:0; padding: 4px 14px; font-size: 12px; font-weight: 700; cursor: pointer; border-radius: 16px; transition: all 0.25s; color: var(--text-secondary); font-family: 'Noto Nastaliq Urdu', serif; display: flex; align-items: center; line-height: 1;">اردو</label>
+                            
+                            <input type="radio" id="shareLangEn" name="shareLangToggle" value="en" style="display: none;">
+                            <label for="shareLangEn" style="margin:0; padding: 4px 14px; font-size: 12px; font-weight: 700; cursor: pointer; border-radius: 16px; transition: all 0.25s; color: var(--text-secondary); display: flex; align-items: center; line-height: 1;">EN</label>
+                        </div>
                     </div>
 
                     <!-- Option 1: Poster Image -->

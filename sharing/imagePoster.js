@@ -16,7 +16,9 @@ function generateAndSharePosterImage(type, referenceKey, targetLang) {
     canvasContainer.setAttribute('dir', lang === 'ur' ? 'rtl' : 'ltr');
 
     let filename = "Qurbani-Campaign-Poster.png";
-    let textMessage = `قربانی کی کھالیں مہم 2026 - دعوتِ اسلامی کینٹ ٹاؤن راولپنڈی\n\n`;
+    let textMessage = lang === 'ur' 
+        ? `قربانی کی کھالیں مہم 2026 - دعوتِ اسلامی کینٹ ٹاؤن راولپنڈی\n\n`
+        : `Qurbani Hides Campaign 2026 - Dawat-e-Islami Cantt Town Rawalpindi\n\n`;
 
     if (type === 'location') {
         const targetRow = sheetDataset.find(row => row["نمبر شمار"] === referenceKey);
@@ -60,8 +62,14 @@ function generateAndSharePosterImage(type, referenceKey, targetLang) {
                 sharedMapLink = cleanCoords;
             }
         }
-        textMessage += `📍 یو سی: ${targetRow["یو سی"]}\n🏠 ایڈریس: ${address}\n👤 ذمہ دار: ${responsiblePerson}\n📞 رابطہ نمبر: ${targetRow["موبائل نمبر"]}\n`;
-        if(sharedMapLink) textMessage += `🗺️ میپ لوکیشن: ${sharedMapLink}\n`;
+        if (lang === 'ur') {
+            textMessage += `📍 یو سی: ${targetRow["یو سی"]}\n🏠 ایڈریس: ${address}\n👤 ذمہ دار: ${responsiblePerson}\n📞 رابطہ نمبر: ${targetRow["موبائل نمبر"]}\n`;
+            if(sharedMapLink) textMessage += `🗺️ میپ لوکیشن: ${sharedMapLink}\n`;
+        } else {
+            textMessage += `📍 UC: ${targetRow["uc"] || targetRow["یو سی"]}\n🏠 Address: ${address}\n👤 Responsible: ${responsiblePerson}\n📞 Contact: ${targetRow["موبائل نمبر"]}\n`;
+            if(sharedMapLink) textMessage += `🗺️ Map Location: ${sharedMapLink}\n`;
+        }
+        textMessage += `\n🔗 https://official-bash.github.io/Khall-Collection_Cantt-Town/`;
     }
 
     if (typeof showToast === "function") {

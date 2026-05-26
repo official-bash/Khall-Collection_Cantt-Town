@@ -143,6 +143,15 @@ function updateLocation(params) {
     sheet.getRange(targetRowIdx, mapLinkColIdx + 1).setValue(mapLink);
     sheet.getRange(targetRowIdx, cordinatesColIdx + 1).setValue(cordinates);
     
+    // Record the update time in the "Time" column (Pakistan Standard Time UTC+5)
+    var timeColIdx = headers.indexOf("Time");
+    if (timeColIdx !== -1) {
+      var now = new Date();
+      // Format as Pakistan time (UTC+5)
+      var pkTime = Utilities.formatDate(now, "Asia/Karachi", "dd/MM/yyyy hh:mm:ss a");
+      sheet.getRange(targetRowIdx, timeColIdx + 1).setValue(pkTime);
+    }
+    
     return makeJsonResponse({ status: "success" });
     
   } catch (error) {

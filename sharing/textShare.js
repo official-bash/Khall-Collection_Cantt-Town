@@ -68,6 +68,8 @@ function shareTextMessage(referenceKey, targetLang) {
         if(sharedMapLink) textMessage += `🗺️ *Google Map Link:* ${sharedMapLink}\n`;
     }
 
+    textMessage += `\n🔗 https://official-bash.github.io/Khall-Collection_Cantt-Town/`;
+
     // Direct platform share if supported, fallback to clipboard
     if (navigator.share) {
         navigator.share({

@@ -835,10 +835,10 @@ function openShareModal(referenceKey) {
     document.getElementById('shareOptTextTitle').innerText = i18n[currentLanguage].shareOptTextTitle;
     document.getElementById('shareOptTextDesc').innerText = i18n[currentLanguage].shareOptTextDesc;
 
-    // Set default share language
-    const langSelect = document.getElementById('shareLanguageSelect');
-    if (langSelect) {
-        langSelect.value = currentLanguage;
+    // Set default share language toggle
+    const langRadio = document.querySelector(`input[name="shareLangToggle"][value="${currentLanguage}"]`);
+    if (langRadio) {
+        langRadio.checked = true;
     }
 
     const modal = document.getElementById('shareOptionsModal');
@@ -851,8 +851,8 @@ function closeShareModal() {
 }
 
 function handleShareOption(option) {
-    const langSelect = document.getElementById('shareLanguageSelect');
-    const shareLang = langSelect ? langSelect.value : currentLanguage;
+    const checkedRadio = document.querySelector('input[name="shareLangToggle"]:checked');
+    const shareLang = checkedRadio ? checkedRadio.value : currentLanguage;
     closeShareModal();
     setTimeout(() => {
         if (option === 'poster') {
