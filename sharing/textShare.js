@@ -1,5 +1,6 @@
 // Text Post Sharing Service
-function shareTextMessage(referenceKey) {
+function shareTextMessage(referenceKey, targetLang) {
+    const lang = targetLang || currentLanguage;
     const targetRow = sheetDataset.find(row => row["نمبر شمار"] === referenceKey);
     if (!targetRow) return;
 
@@ -8,7 +9,7 @@ function shareTextMessage(referenceKey) {
     // Extract localized attributes
     let ucName, pointName, address, responsiblePerson;
 
-    if (currentLanguage === 'ur') {
+    if (lang === 'ur') {
         ucName = targetRow["یو سی"] || "";
         pointName = targetRow["پوائنٹ کا نام"] || `پوائنٹ #${srNo}`;
         address = targetRow["پوائنٹ کا ایڈریس"] || "";
@@ -37,7 +38,7 @@ function shareTextMessage(referenceKey) {
     let brandText = "";
     let callToActionText = "";
 
-    if (currentLanguage === 'ur') {
+    if (lang === 'ur') {
         headingText = "قربانی کی کھالیں";
         subheadingText = "عاشقانِ رسول کی دینی تحریک";
         brandText = "دعوتِ اسلامی";
@@ -51,7 +52,7 @@ function shareTextMessage(referenceKey) {
 
     let textMessage = `🌟 *${headingText}* 🌟\n✨ *${subheadingText}* ✨\n🕌 *${brandText}* 🕌\n📢 *${callToActionText}*\n\n`;
 
-    if (currentLanguage === 'ur') {
+    if (lang === 'ur') {
        
         textMessage += `🏢 *یو سی (UC):* ${ucName}\n`;
         textMessage += `🏠 *پتہ:* ${address}\n`;
@@ -70,12 +71,12 @@ function shareTextMessage(referenceKey) {
     // Direct platform share if supported, fallback to clipboard
     if (navigator.share) {
         navigator.share({
-            title: i18n[currentLanguage].title,
+            title: i18n[lang].title,
             text: textMessage
         })
         .then(() => {
             if (typeof showToast === "function") {
-                showToast(i18n[currentLanguage].successShare);
+                showToast(i18n[lang].successShare);
             }
         })
         .catch(err => {

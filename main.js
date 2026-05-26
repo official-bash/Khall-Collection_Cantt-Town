@@ -2,7 +2,7 @@
 let sheetDataset = [];
 let uniqueUcsList = [];
 let activeSelectedUc = null;
-let currentLanguage = localStorage.getItem('khal_app_lang') || 'ur';
+let currentLanguage = localStorage.getItem('khal_app_lang') || 'en';
 
 // ─── Navigation History Stack ──────────────────────────────────────────────
 // Each entry: { tab: 'home'|'addLocation'|'nearest', ucName: null|string }
@@ -835,6 +835,12 @@ function openShareModal(referenceKey) {
     document.getElementById('shareOptTextTitle').innerText = i18n[currentLanguage].shareOptTextTitle;
     document.getElementById('shareOptTextDesc').innerText = i18n[currentLanguage].shareOptTextDesc;
 
+    // Set default share language
+    const langSelect = document.getElementById('shareLanguageSelect');
+    if (langSelect) {
+        langSelect.value = currentLanguage;
+    }
+
     const modal = document.getElementById('shareOptionsModal');
     modal.classList.add('active');
 }
@@ -845,12 +851,14 @@ function closeShareModal() {
 }
 
 function handleShareOption(option) {
+    const langSelect = document.getElementById('shareLanguageSelect');
+    const shareLang = langSelect ? langSelect.value : currentLanguage;
     closeShareModal();
     setTimeout(() => {
         if (option === 'poster') {
-            generateAndSharePosterImage('location', activeShareReferenceKey);
+            generateAndSharePosterImage('location', activeShareReferenceKey, shareLang);
         } else if (option === 'text') {
-            shareTextMessage(activeShareReferenceKey);
+            shareTextMessage(activeShareReferenceKey, shareLang);
         }
     }, 300);
 }

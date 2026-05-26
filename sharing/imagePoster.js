@@ -1,8 +1,20 @@
+
 // Premium HTML Canvas Dynamic Graphic Image Poster Maker
-function generateAndSharePosterImage(type, referenceKey) {
+// Premium HTML Canvas Dynamic Graphic Image Poster Maker
+function generateAndSharePosterImage(type, referenceKey, targetLang) {
+    const lang = targetLang || currentLanguage;
     const canvasTitle = document.getElementById('canvasDynamicTitle');
     const canvasBody = document.getElementById('canvasDynamicBody');
     
+    // Temporarily apply translations to the poster's hardcoded headers so they match the chosen language
+    document.getElementById('posterMainTitle').innerText = i18n[lang].posterTitle;
+    document.getElementById('posterSubTitle').innerText = i18n[lang].posterSubtitle;
+    document.getElementById('posterBrandTitle').innerText = i18n[lang].posterDawat;
+    document.getElementById('posterActionTitle').innerText = i18n[lang].posterCall;
+    document.getElementById('posterFooterText').innerText = i18n[lang].posterFooter;
+    const canvasContainer = document.getElementById('imagePosterGeneratorCanvas');
+    canvasContainer.setAttribute('dir', lang === 'ur' ? 'rtl' : 'ltr');
+
     let filename = "Qurbani-Campaign-Poster.png";
     let textMessage = `قربانی کی کھالیں مہم 2026 - دعوتِ اسلامی کینٹ ٹاؤن راولپنڈی\n\n`;
 
@@ -13,27 +25,27 @@ function generateAndSharePosterImage(type, referenceKey) {
         canvasTitle.innerText = `${targetRow["یو سی"]}`;
         filename = `${targetRow["یو سی"]}-پوائنٹ-${referenceKey}.png`;
 
-        const address = currentLanguage === 'ur' 
+        const address = lang === 'ur' 
             ? (targetRow["پوائنٹ کا ایڈریس"] || targetRow["location points"] || '')
             : (targetRow["location points"] || targetRow["پوائنٹ کا ایڈریس"] || '');
 
-        const responsiblePerson = currentLanguage === 'ur'
+        const responsiblePerson = lang === 'ur'
             ? (targetRow["پوائنٹ ذمہ دار"] || "")
             : (targetRow["Point responsible"] || targetRow["پوائنٹ ذمہ دار"] || "");
 
         // Premium enhanced HTML structure inside the poster details card
         canvasBody.innerHTML = `
             <div class="text-center bg-black/45 p-4 rounded-2xl border border-yellow-500/20" style="margin-bottom: 12px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);">
-                <span class="text-yellow-300 font-extrabold text-xs tracking-wider block mb-1.5" style="font-family: 'Outfit', 'Inter', sans-serif;">📍 ${i18n[currentLanguage].posterAddress}</span>
-                <p class="text-xl font-bold text-white leading-relaxed font-naskh">${address}</p>
+                <span class="text-yellow-300 font-extrabold text-xs block mb-1.5 font-nastaliq">📍 ${i18n[lang].posterAddress}</span>
+                <p class="text-xl font-bold text-white leading-relaxed font-nastaliq">${address}</p>
             </div>
             <div class="grid grid-cols-2 gap-3">
                 <div class="bg-black/45 p-3.5 rounded-2xl border border-yellow-500/20 text-center">
-                    <span class="text-emerald-300 text-xs font-extrabold block mb-1.5">👤 ${i18n[currentLanguage].posterRep}</span>
-                    <span class="text-base text-slate-100 font-bold leading-normal">${responsiblePerson}</span>
+                    <span class="text-emerald-300 text-xs font-extrabold block mb-1.5 font-nastaliq">👤 ${i18n[lang].posterRep}</span>
+                    <span class="text-base text-slate-100 font-bold leading-normal font-nastaliq">${responsiblePerson}</span>
                 </div>
                 <div class="bg-black/45 p-3.5 rounded-2xl border border-yellow-500/20 text-center">
-                    <span class="text-emerald-300 text-xs font-extrabold block mb-1.5">📞 ${i18n[currentLanguage].posterPhone}</span>
+                    <span class="text-emerald-300 text-xs font-extrabold block mb-1.5 font-nastaliq">📞 ${i18n[lang].posterPhone}</span>
                     <span class="text-base font-mono text-yellow-100 font-black tracking-wide leading-normal">${targetRow["موبائل نمبر"]}</span>
                 </div>
             </div>
@@ -53,44 +65,48 @@ function generateAndSharePosterImage(type, referenceKey) {
     }
 
     if (typeof showToast === "function") {
-        showToast(i18n[currentLanguage].sharingPoster, "info");
+        showToast(i18n[lang].sharingPoster, "info");
     }
     const captureCanvasTarget = document.getElementById('imagePosterGeneratorCanvas');
     
     // Set scale to 3.0 for crisp, ultra-high-definition sharing images
-    html2canvas(captureCanvasTarget, { scale: 3.0, backgroundColor: '#022c22' }).then(canvas => {
-        canvas.toBlob(blob => {
-            const imgFile = new File([blob], filename, { type: 'image/png' });
-            
-            if (navigator.canShare && navigator.canShare({ files: [imgFile] })) {
-                navigator.share({
-                    files: [imgFile],
-                    title: i18n[currentLanguage].title,
-                    text: textMessage
-                })
-                .then(() => {
-                    if (typeof showToast === "function") {
-                        showToast(i18n[currentLanguage].successShare);
-                    }
-                })
-                .catch(err => {
-                    console.log("Share cancelled/failed, downloading locally: ", err);
-                    fallbackDownloadMechanism(canvas, filename);
-                });
-            } else {
-                fallbackDownloadMechanism(canvas, filename);
-            }
-        }, 'image/png');
+    htmlToImage.toPng(captureCanvasTarget, { pixelRatio: 3.0, backgroundColor: '#022c22' }).then(dataUrl => {
+        fetch(dataUrl)
+            .then(res => res.blob())
+            .then(blob => {
+                const imgFile = new File([blob], filename, { type: 'image/png' });
+                
+                if (navigator.canShare && navigator.canShare({ files: [imgFile] })) {
+                    navigator.share({
+                        files: [imgFile],
+                        title: i18n[lang].title,
+                        text: textMessage
+                    })
+                    .then(() => {
+                        if (typeof showToast === "function") {
+                            showToast(i18n[lang].successShare);
+                        }
+                    })
+                    .catch(err => {
+                        console.log("Share cancelled/failed, downloading locally: ", err);
+                        fallbackDownloadMechanism(dataUrl, filename);
+                    });
+                } else {
+                    fallbackDownloadMechanism(dataUrl, filename);
+                }
+            });
+    }).catch(err => {
+        console.error('Error generating image', err);
     });
 }
 
-function fallbackDownloadMechanism(canvas, name) {
+function fallbackDownloadMechanism(dataUrl, name) {
     if (typeof showToast === "function") {
-        showToast(i18n[currentLanguage].fallbackShare, "info");
+        showToast("Downloading Poster / پوسٹر ڈاؤن لوڈ ہو رہا ہے", "info");
     }
     const anchor = document.createElement('a');
     anchor.download = name;
-    anchor.href = canvas.toDataURL('image/png');
+    anchor.href = dataUrl;
     document.body.appendChild(anchor);
     anchor.click();
     document.body.removeChild(anchor);
