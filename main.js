@@ -83,9 +83,9 @@ function applyLanguage() {
     // Adjust main font weight and family dynamically
     if (isUrdu) {
         document.body.classList.remove('font-sans');
-        document.body.classList.add('font-naskh');
+        document.body.classList.add('font-nastaliq');
     } else {
-        document.body.classList.remove('font-naskh');
+        document.body.classList.remove('font-nastaliq');
         document.body.classList.add('font-sans');
     }
 

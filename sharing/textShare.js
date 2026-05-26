@@ -92,7 +92,7 @@ function copyTextToClipboard(text) {
         if (typeof showToast === "function") {
             showToast(i18n[currentLanguage].textCopied, "success");
         }
-    }).catch(err => {
-        console.error("Clipboard copy failed", err);
-    });
-}
+    })    .font-nastaliq {
+        font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
+        line-height: 2.3;
+    }

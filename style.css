@@ -173,7 +173,7 @@ body::before {
    4. TYPOGRAPHY
    ────────────────────────────────── */
 .font-nastaliq {
-    font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
+    font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
     line-height: 2.3;
 }
 
