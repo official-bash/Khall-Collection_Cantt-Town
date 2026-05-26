@@ -9,1328 +9,344 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;700&family=Noto+Naskh+Arabic:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <style>
-        .font-nastaliq {
-            font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
-            line-height: 2.3;
-        }
-        .font-naskh {
-            font-family: 'Noto Naskh Arabic', sans-serif;
-        }
-        .font-sans {
-            font-family: 'Outfit', 'Inter', sans-serif;
-        }
-        .poster-glow {
-            background: linear-gradient(to bottom, #ffe89e 0%, #f3be44 40%, #a47618 70%, #fbf0b9 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .green-glow {
-            text-shadow: 0px 4px 10px rgba(16, 185, 129, 0.3);
-        }
-        /* Active Tab Styling - Green Accent */
-        .tab-active {
-            background-color: #0f5132;
-            color: white;
-            box-shadow: 0 8px 20px -4px rgba(15, 81, 50, 0.4);
-        }
-        /* Color Palette & Custom Styles */
-        .bg-warm-vanilla {
-            background-color: #FAF8F4;
-        }
-        .bg-clay-brown {
-            background-color: #8B5A2B;
-        }
-        .text-clay-brown {
-            color: #8B5A2B;
-        }
-        .border-clay-brown {
-            border-color: #8B5A2B;
-        }
-        /* Smooth Transitions */
-        .interactive-card {
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .interactive-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 24px -10px rgba(139, 90, 43, 0.15), 0 4px 12px -5px rgba(15, 81, 50, 0.1);
-        }
-            .bottom-padding { padding-bottom: 80px; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-warm-vanilla text-slate-800 min-h-screen font-naskh flex flex-col antialiased">
+<body class="font-naskh">
 
-    <!-- Header Block -->
-    <header class="bg-white border-b border-emerald-100 shadow-sm sticky top-0 z-40 backdrop-blur-md bg-opacity-95">
-        <div class="max-w-6xl mx-auto px-4 py-3.5 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-[#0f5132] rounded-xl flex items-center justify-center font-bold text-white shadow-md shadow-emerald-950/20">DI</div>
-                <div>
-                    <h1 id="headerTitle" class="text-base md:text-lg font-extrabold text-[#0f5132]">کھال کلیکشن ڈیش بورڈ 2026</h1>
-                    <p id="headerSub" class="text-[11px] font-bold text-clay-brown">کینٹ ٹاؤن (Cantt Town) راولپنڈی زون</p>
-                </div>
-            </div>
-            
-            <div class="flex items-center gap-2">
-                <!-- Dynamic Language Switcher Toggle -->
-                <button id="langToggleBtn" onclick="toggleLanguage()" class="bg-[#FAF4EE] hover:bg-[#F3E6D5] text-[#8B5A2B] font-extrabold px-3 py-1.5 rounded-full text-xs transition duration-150 flex items-center gap-1.5 border border-[#E9D5BE]">
-                    🌐 <span id="langText">English</span>
-                </button>
-
-                <!-- Points Badge -->
-                <div class="bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full text-[11px] md:text-xs flex items-center gap-1.5 font-bold text-emerald-800">
-                    <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
-                    <span id="totalPointsLabel">ٹوٹل پوائنٹس: </span>
-                    <span id="totalPointsBadge" class="font-extrabold text-emerald-700">0</span>
-                </div>
-            </div>
-        </div>
-    </header>
-
-
-
-    <!-- Main Workspace -->
-    <main class="max-w-6xl w-full mx-auto px-4 py-6 flex-grow">
-        
-        <!-- Loading Spinner Container -->
-        <div id="appSpinner" class="flex flex-col items-center justify-center py-20 space-y-4">
-            <div class="w-12 h-12 border-4 border-[#0f5132] border-t-transparent rounded-full animate-spin"></div>
-            <p id="spinnerLoadingText" class="text-sm font-bold text-clay-brown animate-pulse">گوگل شیٹ سے ڈیٹا لوڈ کیا جا رہا ہے، براہ کرم انتظار کریں...</p>
-        </div>
-
-        <!-- Tab 1 Screen: Dashboard Home -->
-        <div id="homeTabScreen" class="hidden space-y-6">
-            
-            <!-- Beautiful Search Container with GPS Proximity button -->
-            <div class="bg-white border border-emerald-100 rounded-2xl p-4 md:p-5 shadow-sm">
-                <div class="flex flex-col sm:flex-row gap-3">
-                    <div class="relative flex-grow">
-                        <span class="absolute inset-y-0 right-4 flex items-center text-xl pointer-events-none">🔍</span>
-                        <input type="text" id="omniSearchInput" oninput="handleSearch()"
-                               placeholder="پوائنٹ کا نام، ذمہ دار کا نام، لوکیشن (انگلش یا اردو) سے تلاش کریں..." 
-                               class="w-full bg-[#FAF8F4]/60 border border-emerald-800/10 rounded-xl pr-12 pl-4 py-3.5 text-sm md:text-base text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#0f5132] focus:bg-white transition duration-150 shadow-inner">
+    <div class="app-shell">
+        <!-- Header Block -->
+        <header class="app-header">
+            <div class="header-inner">
+                <div class="header-brand">
+                    <div class="header-logo">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px; color: white;">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                        </svg>
                     </div>
-                    <!-- GPS Nearest Button -->
-                    <button onclick="findNearestPoints()" class="bg-[#8B5A2B] hover:bg-[#704214] text-white font-extrabold px-5 py-3.5 rounded-xl text-sm transition duration-150 flex items-center justify-center gap-2 shadow-sm whitespace-nowrap">
-                        <span>📍</span> <span id="nearestBtnLabel">قریبی لوکیشن دیکھیں</span>
-                    </button>
-                </div>
-                <div id="searchStats" class="text-xs font-bold text-clay-brown mt-2.5 mr-1 hidden"></div>
-            </div>
-
-            <!-- Union Councils Grid Block -->
-            <div id="ucGridSection" class="space-y-4">
-                <h2 id="ucSectionHeading" class="text-base md:text-lg font-extrabold text-slate-800 flex items-center gap-2">
-                    <span class="text-[#0f5132]">❖</span> یوزیز (UC) کی فہرست
-                </h2>
-                <div id="ucCardGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                    <!-- UC Cards populated dynamically -->
-                </div>
-            </div>
-
-            <!-- Detailed Points List Block -->
-            <div id="pointsListSection" class="space-y-4 hidden border-t border-slate-200/60 pt-6">
-                <div class="flex justify-between items-center gap-4 flex-wrap">
-                    <h2 id="pointsSectionHeader" class="text-base md:text-lg font-extrabold text-[#0f5132]"></h2>
-                    <button id="backToUcsBtn" onclick="backToUcGrid()" class="text-xs bg-[#FAF4EE] hover:bg-[#F3E6D5] text-[#8B5A2B] font-bold px-3.5 py-2 rounded-xl transition border border-[#E9D5BE] shadow-sm">
-                        ← تمام یوزیز واپس دیکھیں
-                    </button>
-                </div>
-                <div id="pointsContainerList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Points cards populated dynamically -->
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Tab 2 Screen: Add Map Location -->
-        <div id="addLocationTabScreen" class="hidden max-w-xl mx-auto">
-            <div class="bg-white border border-emerald-100 rounded-2xl p-6 shadow-md space-y-5 relative overflow-hidden">
-                <div class="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-[#8B5A2B] via-[#0f5132] to-amber-500"></div>
-                
-                <div>
-                    <h2 id="formTitleText" class="text-lg md:text-xl font-extrabold text-[#0f5132] flex items-center gap-2">📍 گوگل میپ لوکیشن لنک اپڈیٹ کریں</h2>
-                    <p id="formSubtitleText" class="text-xs font-bold text-slate-500 mt-1">فہرست میں صرف وہی پوائنٹس نظر آئیں گے جن کا میپ لنک شیٹ پر اب تک شامل نہیں ہے۔</p>
-                </div>
-
-                <hr class="border-slate-100" />
-
-                <div class="space-y-4">
                     <div>
-                        <label id="formUcSelectLabel" class="block text-xs font-extrabold text-slate-600 mb-1.5">1۔ یو سی (UC) منتخب کریں:</label>
-                        <select id="formUcSelect" onchange="populateFormSerialNumbers()" class="w-full bg-[#FAF8F4] border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold focus:outline-none focus:border-[#0f5132] text-slate-800 shadow-sm transition">
-                            <option value="">-- یو سی منتخب کریں --</option>
-                        </select>
+                        <h1 id="headerTitle" class="header-title">کھال کلیکشن ڈیش بورڈ 2026</h1>
+                        <p id="headerSub" class="header-subtitle">کینٹ ٹاؤن (Cantt Town) راولپنڈی زون</p>
                     </div>
-
-                    <div>
-                        <label id="formSrNoSelectLabel" class="block text-xs font-extrabold text-slate-600 mb-1.5">2۔ نمبر شمار / پوائنٹ منتخب کریں:</label>
-                        <select id="formSrNoSelect" class="w-full bg-[#FAF8F4] border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold focus:outline-none focus:border-[#0f5132] text-slate-800 shadow-sm transition">
-                            <option value="">-- پہلے یو سی منتخب کریں --</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label id="formMapUrlInputLabel" class="block text-xs font-extrabold text-slate-600 mb-1.5">3۔ گوگل میپ لوکیشن لنک (Google Map Link):</label>
-                        <input type="text" id="formMapUrlInput" placeholder="Enter Google Maps URL or coordinates (e.g., 33.598379,73.022724)" 
-                               class="w-full bg-[#FAF8F4] border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#0f5132] text-slate-800 placeholder-slate-400 shadow-sm transition">
-                    </div>
-
-                    <div class="bg-[#FAF4EE]/70 p-4 rounded-xl border border-[#E9D5BE] space-y-2">
-                        <label id="formPasswordInputLabel" class="block text-xs font-extrabold text-[#8B5A2B]">🛡️ سیکیورٹی پاس ورڈ تصدیق:</label>
-                        <input type="password" id="formPasswordInput" maxlength="4" placeholder="منتخب کردہ ذمہ دار کے موبائل نمبر کے آخری 4 ہندسے لکھیں" 
-                               class="w-full bg-white border border-[#E9D5BE] rounded-lg px-3 py-2.5 text-center text-sm tracking-widest font-extrabold focus:outline-none focus:border-[#0f5132] text-slate-800 shadow-sm">
-                    </div>
-
-                    <button onclick="submitLocationUpdate()" class="w-full bg-[#0f5132] hover:bg-[#157347] text-white font-extrabold py-3.5 px-4 rounded-xl transition duration-200 shadow-md shadow-emerald-950/20 flex items-center justify-center gap-2">
-                        <span id="formSubmitBtnLabel">🚀 گوگل شیٹ پر محفوظ کریں</span>
+                </div>
+                
+                <div class="header-actions">
+                    <!-- Dynamic Language Switcher Toggle -->
+                    <button id="langToggleBtn" onclick="toggleLanguage()" class="lang-toggle-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                        <span id="langText">English</span>
                     </button>
-                </div>
-            </div>
-        </div>
 
-    </main>
-
-    <!-- Hidden Poster Generator Target -->
-    <div class="fixed left-[-9999px] top-[-9999px]">
-        <div id="imagePosterGeneratorCanvas" class="w-[500px] aspect-[2/3] bg-gradient-to-b from-[#032d54] via-[#05437a] to-[#011c36] p-4 flex flex-col justify-between relative" dir="rtl">
-            <div class="absolute inset-0 opacity-10 pointer-events-none bg-repeat opacity-5" style="background-image: radial-gradient(circle, white 2px, transparent 2px); background-size: 20px 20px;"></div>
-            
-            <div class="text-center space-y-2 relative z-10">
-                <h2 id="posterMainTitle" class="font-nastaliq poster-glow text-5xl font-extrabold tracking-normal py-1 leading-tight drop-shadow-xl">قربانی کی کھالیں</h2>
-                <p id="posterSubTitle" class="text-cyan-200 text-xs font-bold tracking-wider bg-black/40 px-4 py-1 rounded-full inline-block border border-cyan-500/10">عاشقان رسول کی دینی تحریک</p>
-                <h1 id="posterBrandTitle" class="font-nastaliq text-emerald-400 text-4xl font-black py-1 green-glow leading-none">دعوت اسلامی</h1>
-                <p id="posterActionTitle" class="font-nastaliq text-yellow-300 text-base font-medium">کو دے کر دینی کاموں میں حصہ لیجیے</p>
-            </div>
-
-            <div class="bg-gradient-to-b from-[#0f4d87] to-[#062c52] rounded-2xl border-[3px] border-[#ffd700] shadow-2xl overflow-hidden mt-4 flex-grow flex flex-col justify-between">
-                <div class="bg-gradient-to-r from-yellow-500 via-amber-400 to-yellow-500 py-2 px-4 text-center border-b-[2px] border-[#ffd700]">
-                    <h3 id="canvasDynamicTitle" class="font-nastaliq text-xl font-black text-amber-950 leading-none">وارڈ لوکیشنز انفارمیشن</h3>
-                </div>
-                
-                <div class="p-4 flex-grow flex flex-col justify-center">
-                    <div id="canvasDynamicBody" class="w-full text-slate-100 space-y-3">
-                        <!-- Dynamic details added via JS -->
+                    <!-- Points Badge -->
+                    <div class="points-badge">
+                        <span class="pulse-dot"></span>
+                        <span id="totalPointsLabel">ٹوٹل پوائنٹس: </span>
+                        <span id="totalPointsBadge">0</span>
                     </div>
                 </div>
+            </div>
+            <!-- Dynamic bottom border line -->
+            <div class="gradient-bar"></div>
+        </header>
 
-                <div id="posterFooterText" class="bg-black/30 py-1.5 text-center text-[10px] text-slate-400 border-t border-white/5">
-                    کینٹ ٹاؤن راولپنڈی مہم ڈیش بورڈ پینل
+        <!-- Main Workspace -->
+        <main class="main-content content-wrapper">
+            
+            <!-- Loading Spinner & Skeleton Container -->
+            <div id="appSpinner" class="loading-container">
+                <div class="modern-spinner"></div>
+                <p id="spinnerLoadingText" class="loading-text">گوگل شیٹ سے ڈیٹا لوڈ کیا جا رہا ہے، براہ کرم انتظار کریں...</p>
+                <div class="loading-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                
+                <!-- Skeleton Loading grid preview while downloading Google Sheets payload -->
+                <div class="skeleton-grid" style="width: 100%;">
+                    <div class="skeleton-card">
+                        <div class="skeleton-el skeleton-circle"></div>
+                        <div class="skeleton-el skeleton-line-lg"></div>
+                        <div class="skeleton-el skeleton-line-sm"></div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div class="skeleton-el skeleton-circle"></div>
+                        <div class="skeleton-el skeleton-line-lg"></div>
+                        <div class="skeleton-el skeleton-line-sm"></div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div class="skeleton-el skeleton-circle"></div>
+                        <div class="skeleton-el skeleton-line-lg"></div>
+                        <div class="skeleton-el skeleton-line-sm"></div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div class="skeleton-el skeleton-circle"></div>
+                        <div class="skeleton-el skeleton-line-lg"></div>
+                        <div class="skeleton-el skeleton-line-sm"></div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Beautiful Share Options Modal -->
-    <div id="shareOptionsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300 pointer-events-auto">
-        <div class="bg-white rounded-3xl border border-emerald-100 p-6 md:p-8 max-w-sm w-full shadow-2xl transform scale-95 transition-transform duration-300 space-y-6 relative overflow-hidden">
-            <div class="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-[#8B5A2B] via-[#0f5132] to-amber-500"></div>
-            
-            <button onclick="closeShareModal()" class="absolute top-4 left-4 text-slate-400 hover:text-slate-600 transition text-lg p-1.5 bg-slate-50 hover:bg-slate-100 rounded-full w-8 h-8 flex items-center justify-center font-bold">×</button>
-            
-            <div class="text-center space-y-2 pt-2">
-                <h3 id="shareModalTitle" class="text-lg font-extrabold text-[#0f5132]">📢 شیئرنگ آپشنز</h3>
-                <p id="shareModalDesc" class="text-xs font-bold text-slate-500">براہ کرم منتخب کریں کہ آپ اسے کیسے شیئر کرنا چاہتے ہیں:</p>
-            </div>
-
-            <div class="space-y-3.5">
-                <!-- Option 1: Poster Image -->
-                                    <button type="button" onclick="handleShareOption('poster')" class="w-full bg-[#FAF4EE] hover:bg-[#F3E6D5] text-[#8B5A2B] border border-[#E9D5BE] p-4 rounded-2xl transition duration-200 text-right flex items-center justify-between group shadow-sm hover:shadow-md">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center text-xl group-hover:bg-[#8B5A2B] group-hover:text-white transition duration-150">🖼️</div>
-                        <div class="text-right">
-                            <span id="shareOptPosterTitle" class="block text-sm font-extrabold text-[#8B5A2B]">تصویری پوسٹر (Image Poster)</span>
-                            <span id="shareOptPosterDesc" class="block text-[10px] font-bold text-slate-500 mt-0.5">پوائنٹ کارڈ کی خوبصورت تصویر تیار کریں</span>
-                        </div>
-                    </div>
-                    <span class="text-lg text-[#8B5A2B]/60 group-hover:translate-x-[-4px] transition transform">←</span>
-                </button>
-
-                <!-- Option 2: Text Post -->
-                <button onclick="handleShareOption('text')" class="w-full bg-emerald-50/50 hover:bg-emerald-50 text-[#0f5132] border border-emerald-100 p-4 rounded-2xl transition duration-200 text-right flex items-center justify-between group shadow-sm hover:shadow-md">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center text-xl group-hover:bg-[#0f5132] group-hover:text-white transition duration-150">✍️</div>
-                        <div class="text-right">
-                            <span id="shareOptTextTitle" class="block text-sm font-extrabold text-[#0f5132]">تحریری پیغام (Text Post)</span>
-                            <span id="shareOptTextDesc" class="block text-[10px] font-bold text-slate-500 mt-0.5">کاپی اور شیئر کرنے کے لیے تحریری پیغام</span>
-                        </div>
-                    </div>
-                    <span class="text-lg text-[#0f5132]/60 group-hover:translate-x-[-4px] transition transform">←</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Notification Container -->
-    <div id="toastNotificationShelf" class="fixed bottom-5 left-5 z-55 space-y-2 max-w-sm pointer-events-none"></div>
-
-    <!-- Config Import & Application Script -->
-    <script src="config.js"></script>
-    <script>
-        // Bilingual Localization Dictionary Mapping Core
-        const i18n = {
-            ur: {
-                title: "دعوتِ اسلامی - کینٹ ٹاؤن کھال کلیکشن مہم",
-                dashboardTitle: "کھال کلیکشن ڈیش بورڈ 2026",
-                townName: "کینٹ ٹاؤن (Cantt Town) راولپنڈی زون",
-                totalPoints: "ٹوٹل پوائنٹس",
-                homeTab: "🏠 ہوم پیج",
-                addLocationTab: "📍 لوکیشن شامل کریں",
-                loading: "گوگل شیٹ سے ڈیٹا لوڈ کیا جا رہا ہے، براہ کرم انتظار کریں...",
-                searchPlaceholder: "پوائنٹ کا نام، ذمہ دار کا نام، لوکیشن (انگلش یا اردو) سے تلاش کریں...",
-                ucSectionHeader: "❖ یوزیز (UC) کی فہرست",
-                pointsListHeader: "لوکیشن پوائنٹس",
-                backToUcs: "← تمام یوزیز واپس دیکھیں",
-                formTitle: "📍 گوگل میپ لوکیشن لنک اپڈیٹ کریں",
-                formSubtitle: "فہرست میں صرف وہی پوائنٹس نظر آئیں گے جن کا میپ لنک شیٹ پر اب تک شامل نہیں ہے۔",
-                selectUcLabel: "1۔ یو سی (UC) منتخب کریں:",
-                selectPointLabel: "2۔ نمبر شمار / پوائنٹ منتخب کریں:",
-                mapLinkLabel: "3۔ گوگل میپ لوکیشن لنک (Google Map Link):",
-                securityLabel: "🛡️ سیکیورٹی پاس ورڈ تصدیق:",
-                securityPlaceholder: "منتخب کردہ ذمہ دار کے موبائل نمبر کے آخری 4 ہندسے لکھیں",
-                submitBtn: "🚀 گوگل شیٹ پر محفوظ کریں",
-                selectUcDefault: "-- یو سی منتخب کریں --",
-                selectPointDefault: "-- پہلے یو سی منتخب کریں --",
-                pointsCount: "پوائنٹس",
-                serial: "سیریل",
-                responsible: "ذمہ دار",
-                whatsappBtn: "💬 واٹس ایپ اوپن کریں",
-                mapBtn: "🗺️ گوگل میپ لوکیشن",
-                addMapBtn: "➕ میپ لنک ایڈ کریں",
-                shareBtn: "📢 شیئر",
-                sharingPoster: "شیئرنگ پوسٹر امیج تیار کی جا رہی ہے...",
-                successShare: "پوسٹ کامیابی سے شیئر کر دی گئی ہے!",
-                fallbackShare: "آپ کا ڈیوائس ڈائریکٹ شیئرنگ سپورٹ نہیں کرتا۔ پوسٹر امیج ڈاؤن لوڈ کی جا رہی ہے...",
-                setupIncomplete: "سیٹ اپ ادھورا ہے! برائے مہربانی config.js میں اپنا Google Apps Script URL درج کریں۔",
-                configError: "ایپ کنفگریشن ایرر: Apps Script کا درست URL لنک نہیں مل سکا۔",
-                connectionError: "ڈیٹا کنکشن میں خرابی آئی ہے۔ برائے مہربانی پیج ریفریش کریں۔",
-                toastAllFields: "براہ کرم فارم کے تمام خانے درست تفصیلات سے پُر کریں!",
-                toastValidUrl: "براہ کرم درست گوگل میپ یو آر ایل یا کوآرڈینیٹس (lat, lng) درج کریں!",
-                toastAutoSelected: "یو سی اور سیریل نمبر خودکار طور پر فارم میں منتخب کر لیے گئے ہیں۔",
-                toastUpdated: "لوکیشن لنک کامیابی سے اپڈیٹ کر دیا گیا ہے!",
-                allPointsUpdated: "🎉 اس یو سی کے تمام پوائنٹس پہلے ہی اپڈیٹڈ ہیں!",
-                posterTitle: "قربانی کی کھالیں",
-                posterSubtitle: "عاشقان رسول کی دینی تحریک",
-                posterDawat: "دعوت اسلامی",
-                posterCall: "کو دے کر دینی کاموں میں حصہ لیجیے",
-                posterAddress: "📍 کلیکشن پوائنٹ ایڈریس",
-                posterRep: "پوائنٹ ذمہ دار",
-                posterPhone: "موبائل نمبر",
-                posterCampaignTitle: "وارڈ لوکیشنز انفارمیشن",
-                posterFooter: "کینٹ ٹاؤن راولپنڈی مہم ڈیش بورڈ پینل",
-                noPoints: "اس یو سی کے تحت کوئی پوائنٹس دستیاب نہیں ہیں۔",
-                searchResults: "تلاش کے نتائج",
-                foundPoints: "پوائنٹس ملے",
-                searchSummary: "کل {total} ریکارڈز میں سے {count} مماثلت پانے والے پوائنٹس تلاش کر لیے گئے ہیں۔",
-                nearestBtn: "📍 قریبی لوکیشن دیکھیں",
-                gpsAcquiring: "آپ کی لوکیشن حاصل کی جا رہی ہے...",
-                gpsError: "لوکیشن تک رسائی حاصل نہیں ہو سکی۔",
-                gpsUnsupported: "آپ کا براؤزر لوکیشن حاصل کرنے کو سپورٹ نہیں کرتا۔",
-                closestBadge: "سب سے قریبی 🌟",
-                away: "دور",
-                meters: "میٹر",
-                kilometers: "کلومیٹر",
-                nearestPointsHeader: "📍 آپ کے سب سے قریبی پوائنٹس",
-                getDirections: "🗺️ راستہ تلاش کریں",
-                gpsDenied: "ہم قریبی پوائنٹس تلاش کرنے کے لیے آپ کی لوکیشن حاصل نہیں کر سکے۔ مینوئل سرچ پر واپس جا رہے ہیں۔",
-                noCoordsPoints: "گوگل شیٹ میں کوآرڈینیٹس والا کوئی پوائنٹ نہیں ملا۔",
-                shareModalTitle: "📢 شیئرنگ آپشنز",
-                shareModalDesc: "براہ کرم منتخب کریں کہ آپ اسے کیسے شیئر کرنا چاہتے ہیں:",
-                shareOptPosterTitle: "تصویری پوسٹر (Image Poster)",
-                shareOptPosterDesc: "پوائنٹ کارڈ کی خوبصورت تصویر تیار کریں",
-                shareOptTextTitle: "تحریری پیغام (Text Post)",
-                shareOptTextDesc: "کاپی اور شیئر کرنے کے لیے تحریری پیغام",
-                textCopied: "تحریری پیغام کامیابی سے کاپی کر لیا گیا ہے!"
-            },
-            en: {
-                title: "Dawat-e-Islami - Cantt Town Khal Collection",
-                dashboardTitle: "Khal Collection Dashboard 2026",
-                townName: "Cantt Town Rawalpindi Zone",
-                totalPoints: "Total Points",
-                homeTab: "🏠 Home Page",
-                addLocationTab: "📍 Add Location Link",
-                loading: "Loading data from Google Sheet, please wait...",
-                searchPlaceholder: "Search by point name, person in charge, location (Urdu/English)...",
-                ucSectionHeader: "❖ Union Councils (UC) List",
-                pointsListHeader: "Location Points",
-                backToUcs: "← Back to all UCs",
-                formTitle: "📍 Update Google Map Location Link",
-                formSubtitle: "Only points without a map link on the sheet will be displayed in the list.",
-                selectUcLabel: "1. Select UC (Union Council):",
-                selectPointLabel: "2. Select Point Serial / Name:",
-                mapLinkLabel: "3. Google Map Location Link:",
-                securityLabel: "🛡️ Security Password Verification:",
-                securityPlaceholder: "Enter the last 4 digits of the responsible person's mobile number",
-                submitBtn: "🚀 Save to Google Sheet",
-                selectUcDefault: "-- Select UC --",
-                selectPointDefault: "-- Select UC First --",
-                pointsCount: "Points",
-                serial: "Serial",
-                responsible: "Responsible",
-                whatsappBtn: "💬 Open WhatsApp",
-                mapBtn: "🗺️ Google Map Location",
-                addMapBtn: "➕ Add Map Link",
-                shareBtn: "📢 Share",
-                sharingPoster: "Generating shareable poster image...",
-                successShare: "Poster shared successfully!",
-                fallbackShare: "Direct sharing not supported on this device. Downloading poster image...",
-                setupIncomplete: "Setup incomplete! Please enter your Google Apps Script URL in config.js.",
-                configError: "Configuration Error: Valid Apps Script URL not found.",
-                connectionError: "Error connecting to data. Please refresh the page.",
-                toastAllFields: "Please fill all form fields with correct details!",
-                toastValidUrl: "Please enter a valid Google Maps URL!",
-                toastAutoSelected: "UC and Serial Number automatically selected in the form.",
-                toastUpdated: "Location link updated successfully!",
-                allPointsUpdated: "🎉 All points in this UC are already updated!",
-                posterTitle: "Qurbani Hides Collection",
-                posterSubtitle: "Religious movement of Ashiqan-e-Rasool",
-                posterDawat: "Dawat-e-Islami",
-                posterCall: "Donate your hides and participate in religious work",
-                posterAddress: "📍 Collection Point Address",
-                posterRep: "Person in Charge",
-                posterPhone: "Mobile Number",
-                posterCampaignTitle: "Ward Locations Information",
-                posterFooter: "Cantt Town Rawalpindi Campaign Dashboard Panel",
-                noPoints: "No points available under this UC.",
-                searchResults: "Search Results",
-                foundPoints: "Points Found",
-                searchSummary: "Found {count} matching points out of {total} total records.",
-                nearestBtn: "📍 Find Nearest Points",
-                gpsAcquiring: "Acquiring your location...",
-                gpsError: "Unable to retrieve your location.",
-                gpsUnsupported: "Geolocation is not supported by your browser.",
-                closestBadge: "Closest 🌟",
-                away: "away",
-                meters: "meters",
-                kilometers: "km",
-                nearestPointsHeader: "📍 Nearest Points to You",
-                getDirections: "🗺️ Get Directions",
-                gpsDenied: "We could not access your location to find nearest points. Reverting to manual search.",
-                noCoordsPoints: "No coordinate-based points found in the sheet.",
-                shareModalTitle: "📢 Sharing Options",
-                shareModalDesc: "Please select how you would like to share this location:",
-                shareOptPosterTitle: "Poster Image",
-                shareOptPosterDesc: "Generate a beautiful image poster of the point",
-                shareOptTextTitle: "Text Message",
-                shareOptTextDesc: "Copy or share a formatted text message post",
-                textCopied: "Text post copied to clipboard successfully!"
-            }
-        };
-
-        // Application Reactive Core State memory storage
-        let sheetDataset = [];
-        let uniqueUcsList = [];
-        let activeSelectedUc = null;
-        let currentLanguage = localStorage.getItem('khal_app_lang') || 'ur';
-
-        // Life Cycle Hook Initialization
-        window.addEventListener('DOMContentLoaded', () => {
-            applyLanguage();
-            fetchDatasetFromGoogleSheet();
-        });
-
-        // Toggle Application Language Setting
-        function toggleLanguage() {
-            currentLanguage = currentLanguage === 'ur' ? 'en' : 'ur';
-            localStorage.setItem('khal_app_lang', currentLanguage);
-            applyLanguage();
-        }
-
-        // Apply selected language translations recursively
-        function applyLanguage() {
-            const isUrdu = currentLanguage === 'ur';
-            document.documentElement.dir = isUrdu ? 'rtl' : 'ltr';
-            document.documentElement.lang = currentLanguage;
-
-            // Adjust main font weight and family dynamically
-            if (isUrdu) {
-                document.body.classList.remove('font-sans');
-                document.body.classList.add('font-naskh');
-            } else {
-                document.body.classList.remove('font-naskh');
-                document.body.classList.add('font-sans');
-            }
-
-            // Update Page Title
-            document.title = i18n[currentLanguage].title;
-
-            // Simple text labels translation
-            document.getElementById('headerTitle').innerText = i18n[currentLanguage].dashboardTitle;
-            document.getElementById('headerSub').innerText = i18n[currentLanguage].townName;
-            document.getElementById('totalPointsLabel').innerText = i18n[currentLanguage].totalPoints + ": ";
-            document.getElementById('spinnerLoadingText').innerText = i18n[currentLanguage].loading;
-
-            // Search Bar i18n
-            document.getElementById('omniSearchInput').placeholder = i18n[currentLanguage].searchPlaceholder;
-            document.getElementById('ucSectionHeading').innerText = i18n[currentLanguage].ucSectionHeader;
-            document.getElementById('backToUcsBtn').innerText = i18n[currentLanguage].backToUcs;
-            document.getElementById('nearestBtnLabel').innerText = i18n[currentLanguage].nearestBtn;
-
-            // Form Content i18n
-            document.getElementById('formTitleText').innerText = i18n[currentLanguage].formTitle;
-            document.getElementById('formSubtitleText').innerText = i18n[currentLanguage].formSubtitle;
-            document.getElementById('formUcSelectLabel').innerText = i18n[currentLanguage].selectUcLabel;
-            document.getElementById('formSrNoSelectLabel').innerText = i18n[currentLanguage].selectPointLabel;
-            document.getElementById('formMapUrlInputLabel').innerText = i18n[currentLanguage].mapLinkLabel;
-            document.getElementById('formPasswordInputLabel').innerText = i18n[currentLanguage].securityLabel;
-            document.getElementById('formPasswordInput').placeholder = i18n[currentLanguage].securityPlaceholder;
-            document.getElementById('formSubmitBtnLabel').innerText = i18n[currentLanguage].submitBtn;
-
-            // Poster dynamic translations
-            document.getElementById('posterMainTitle').innerText = i18n[currentLanguage].posterTitle;
-            document.getElementById('posterSubTitle').innerText = i18n[currentLanguage].posterSubtitle;
-            document.getElementById('posterBrandTitle').innerText = i18n[currentLanguage].posterDawat;
-            document.getElementById('posterActionTitle').innerText = i18n[currentLanguage].posterCall;
-            document.getElementById('posterFooterText').innerText = i18n[currentLanguage].posterFooter;
-
-            // Language Toggle Text Update
-            document.getElementById('langText').innerText = isUrdu ? 'English' : 'اردو';
-
-            // Re-render components with translated static attributes
-            if (sheetDataset.length > 0) {
-                renderUcCardsGrid(uniqueUcsList);
-                populateFormUcDropdowns();
-                if (activeSelectedUc) {
-                    handleUcCardClick(activeSelectedUc);
-                } else {
-                    const query = document.getElementById('omniSearchInput').value.trim();
-                    if (query) {
-                        handleSearch();
-                    }
-                }
-            }
-        }
-
-        // Fetch primary campaign list from App Script Endpoint securely (using GET action)
-        function fetchDatasetFromGoogleSheet() {
-            if (API_URL.includes("YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE")) {
-                showToast(i18n[currentLanguage].setupIncomplete, "error");
-                document.getElementById('appSpinner').innerHTML = `<p class="text-red-600 p-6 text-center font-bold bg-red-50 border border-red-200 rounded-xl">${i18n[currentLanguage].configError}</p>`;
-                return;
-            }
-
-            const url = API_URL + "?action=getData";
-
-            fetch(url, { redirect: 'follow' })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("HTTP error: " + response.status);
-                }
-                return response.text();
-            })
-            .then(text => {
-                // Google Apps Script may return HTML on error (e.g., auth page).
-                // Try to parse as JSON; if it fails, show a clear error.
-                let payload;
-                try {
-                    payload = JSON.parse(text);
-                } catch (parseErr) {
-                    console.error("JSON Parse Error. Raw response:", text.substring(0, 500));
-                    throw new Error("سرور سے غیر متوقع جواب آیا۔ براہ کرم Apps Script دوبارہ Deploy کریں۔ / Unexpected response from server. Please re-deploy Apps Script.");
-                }
-
-                if(payload.status === "success") {
-                    sheetDataset = payload.data;
-                    document.getElementById('totalPointsBadge').innerText = sheetDataset.length;
-                    
-                    // Compile unique list of UCs (checks English 'uc' column if language is English)
-                    updateUcList();
-
-                    // Render UI components asynchronously
-                    document.getElementById('appSpinner').classList.add('hidden');
-                    switchTab('home');
-                    renderUcCardsGrid(uniqueUcsList);
-                    populateFormUcDropdowns();
-                } else {
-                    throw new Error(payload.message || "Unknown error from Apps Script");
-                }
-            })
-            .catch(err => {
-                console.error("Critical Fetch Error: ", err);
-                showToast(i18n[currentLanguage].connectionError, "error");
-                document.getElementById('appSpinner').innerHTML = `<p class="text-red-600 font-bold p-4 bg-red-50 rounded-xl border border-red-100">${err.message || i18n[currentLanguage].connectionError}</p>`;
-            });
-        }
-
-        // Compile unique UC list based on current language
-        function updateUcList() {
-            const allUcs = sheetDataset.map(row => {
-                if (currentLanguage === 'ur') {
-                    return row["یو سی"] ? row["یو سی"].trim() : "";
-                } else {
-                    return (row["uc"] || row["یو سی"] || "").trim();
-                }
-            }).filter(Boolean);
-            uniqueUcsList = [...new Set(allUcs)];
-        }
-
-        // Render Homepage UC Category Cards UI elements
-        function renderUcCardsGrid(ucs) {
-            const gridContainer = document.getElementById('ucCardGrid');
-            gridContainer.innerHTML = '';
-
-            // Ensure the unique list matches the language preference
-            updateUcList();
-
-            uniqueUcsList.forEach(ucName => {
-                // Calculate hubs under this specific UC (handles both English 'uc' and Urdu 'یو سی')
-                const hubsCount = sheetDataset.filter(row => {
-                    const rowUc = currentLanguage === 'ur'
-                        ? (row["یو سی"] || "")
-                        : (row["uc"] || row["یو سی"] || "");
-                    return rowUc.trim() === ucName.trim();
-                }).length;
-
-                const cardNode = document.createElement('div');
-                cardNode.className = "bg-white border border-[#E9D5BE]/60 hover:border-[#0f5132] p-5 rounded-2xl shadow-sm hover:shadow-md text-center cursor-pointer transition transform hover:-translate-y-0.5 active:scale-95 duration-150 flex flex-col justify-between items-center group interactive-card";
-                cardNode.onclick = () => handleUcCardClick(ucName);
-                cardNode.innerHTML = `
-                    <div class="w-12 h-12 bg-emerald-50 text-[#0f5132] group-hover:bg-[#0f5132] group-hover:text-white rounded-2xl flex items-center justify-center text-xl font-bold mb-3.5 transition duration-150 shadow-sm">🏢</div>
-                    <h3 class="text-sm md:text-base font-extrabold text-slate-800 group-hover:text-[#0f5132] transition duration-150">${ucName}</h3>
-                    <span class="mt-2.5 text-[11px] font-extrabold bg-[#FAF4EE] px-3 py-1 rounded-full text-clay-brown border border-[#E9D5BE]/40">${hubsCount} ${i18n[currentLanguage].pointsCount}</span>
-                `;
-                gridContainer.appendChild(cardNode);
-            });
-            document.getElementById('ucGridSection').classList.remove('hidden');
-        }
-
-        // Handler triggering deep drill list display
-        function handleUcCardClick(ucName) {
-            activeSelectedUc = ucName;
-            document.getElementById('ucGridSection').classList.add('hidden');
-            
-            // Extract the filtered points under the selected UC
-            const filteredPoints = sheetDataset.filter(row => {
-                const rowUc = currentLanguage === 'ur'
-                    ? (row["یو سی"] || "")
-                    : (row["uc"] || row["یو سی"] || "");
-                return rowUc.trim() === ucName.trim();
-            });
-            document.getElementById('pointsSectionHeader').innerText = `${i18n[currentLanguage].pointsListHeader}: ${ucName}`;
-            
-            renderPointsListMarkup(filteredPoints);
-        }
-
-        // Return state machine focus tracking view frame context
-        function backToUcGrid() {
-            document.getElementById('pointsListSection').classList.add('hidden');
-            document.getElementById('ucGridSection').classList.remove('hidden');
-            document.getElementById('omniSearchInput').value = '';
-            document.getElementById('searchStats').classList.add('hidden');
-            activeSelectedUc = null;
-        }
-
-        // Parse coordinates out of standard Google Maps URLs
-        function parseCoordsFromUrl(url) {
-            if (!url) return null;
-            
-            // Pattern 1: @lat,lng
-            let match = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
-            if (match) {
-                return { lat: parseFloat(match[1]), lng: parseFloat(match[2]) };
-            }
-
-            // Pattern 2: q=lat,lng or query=lat,lng
-            match = url.match(/[?&](q|query)=(-?\d+\.\d+),(-?\d+\.\d+)/);
-            if (match) {
-                return { lat: parseFloat(match[2]), lng: parseFloat(match[3]) };
-            }
-
-            // Pattern 3: any sequence of "lat,lng" floats
-            match = url.match(/(-?\d+\.\d+)\s*,\s*(-?\d+\.\d+)/);
-            if (match) {
-                const lat = parseFloat(match[1]);
-                const lng = parseFloat(match[2]);
-                if (Math.abs(lat) <= 90 && Math.abs(lng) <= 180 && lat !== 0 && lng !== 0) {
-                    return { lat, lng };
-                }
-            }
-            return null;
-        }
-
-        // Haversine Distance formula implementation
-        function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371; // Earth radius in km
-            const dLat = deg2rad(lat2 - lat1);
-            const dLon = deg2rad(lon2 - lon1);
-            const a =
-                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-                Math.sin(dLon / 2) * Math.sin(dLon / 2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            return R * c; // Distance in kilometers
-        }
-
-        function deg2rad(deg) {
-            return deg * (Math.PI / 180);
-        }
-
-        // Geolocation Proximity Engine
-        function findNearestPoints() {
-            if (!navigator.geolocation) {
-                showToast(i18n[currentLanguage].gpsUnsupported, "error");
-                return;
-            }
-
-            showToast(i18n[currentLanguage].gpsAcquiring, "info");
-
-            navigator.geolocation.getCurrentPosition(position => {
-                const userLat = position.coords.latitude;
-                const userLng = position.coords.longitude;
-
-                // Calculate distance to all points containing coordinates
-                const pointsWithDistance = sheetDataset.map(point => {
-                    let coords = null;
-                    if (point["cordinates"]) {
-                        coords = parseCoordsFromUrl(point["cordinates"].trim());
-                    }
-                    if (!coords && point["Google Map Link"]) {
-                        coords = parseCoordsFromUrl(point["Google Map Link"].trim());
-                    }
-                    if (coords) {
-                        const distance = calculateDistance(userLat, userLng, coords.lat, coords.lng);
-                        return { ...point, distance };
-                    }
-                    return { ...point, distance: Infinity };
-                }).filter(point => point.distance !== Infinity);
-
-                if (pointsWithDistance.length === 0) {
-                    showToast(i18n[currentLanguage].noCoordsPoints, "error");
-                    return;
-                }
-
-                // Sort points by distance ascending
-                pointsWithDistance.sort((a, b) => a.distance - b.distance);
-
-                // Get top 5 closest points (3-5 points requested)
-                const nearestPoints = pointsWithDistance.slice(0, 5);
-
-                // Open points display list with nearest points
-                document.getElementById('ucGridSection').classList.add('hidden');
-                document.getElementById('pointsListSection').classList.remove('hidden');
-                document.getElementById('pointsSectionHeader').innerText = i18n[currentLanguage].nearestPointsHeader;
-
-                renderPointsListMarkup(nearestPoints, true);
-            }, error => {
-                console.error("Geolocation Error: ", error);
-                let msg = i18n[currentLanguage].gpsError;
-                if (error.code === error.PERMISSION_DENIED) {
-                    msg = i18n[currentLanguage].gpsDenied;
-                }
-                showToast(msg, "error");
+            <!-- Tab 1 Screen: Dashboard Home -->
+            <div id="homeTabScreen" class="hidden section-spacing">
                 
-                // Fall back to manual UC search
-                switchTab('home');
-                backToUcGrid();
-                
-                const searchInput = document.getElementById('omniSearchInput');
-                if (searchInput) {
-                    searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    searchInput.focus();
-                }
-            }, {
-                enableHighAccuracy: true,
-                timeout: 8000,
-                maximumAge: 0
-            });
-        }
-
-        // Render localized detailed point components cards lists layout grid system
-        function renderPointsListMarkup(pointsList, showDistance = false) {
-            const listContainer = document.getElementById('pointsContainerList');
-            listContainer.innerHTML = '';
-
-            if (pointsList.length === 0) {
-                listContainer.innerHTML = `<p class="col-span-full text-center text-sm font-bold text-slate-400 py-8">${i18n[currentLanguage].noPoints}</p>`;
-                document.getElementById('pointsListSection').classList.remove('hidden');
-                return;
-            }
-
-            pointsList.forEach((point, index) => {
-                let mapLink = point["Google Map Link"] ? point["Google Map Link"].trim() : "";
-                if (!mapLink && point["cordinates"]) {
-                    const cleanCoords = point["cordinates"].trim();
-                    if (/^-?\d+\.\d+\s*,\s*-?\d+\.\d+$/.test(cleanCoords)) {
-                        mapLink = "https://maps.google.com/?q=" + cleanCoords;
-                    } else if (cleanCoords.startsWith("http://") || cleanCoords.startsWith("https://")) {
-                        mapLink = cleanCoords;
-                    }
-                }
-                const cleanPhone = point["موبائل نمبر"] ? point["موبائل نمبر"].replace(/[^0-9]/g, "") : "";
-                const srNo = point["نمبر شمار"];
-                
-                // Get bilingual UC name
-                const ucName = currentLanguage === 'ur'
-                    ? (point["یو سی"] || "")
-                    : (point["uc"] || point["یو سی"] || "");
-
-                // Get bilingual Point Name
-                const pointName = currentLanguage === 'ur'
-                    ? (point["پوائنٹ کا نام"] || point["Point Name"] || `پوائنٹ #${srNo}`)
-                    : (point["Point Name"] || point["پوائنٹ کا نام"] || `Point #${srNo}`);
-
-                // Get bilingual Point Responsible
-                const responsiblePerson = currentLanguage === 'ur'
-                    ? (point["پوائنٹ ذمہ دار"] || "")
-                    : (point["Point responsible"] || point["پوائنٹ ذمہ دار"] || "");
-
-                // Get bilingual Point Address
-                const address = currentLanguage === 'ur' 
-                    ? (point["پوائنٹ کا ایڈریس"] || point["location points"] || '') 
-                    : (point["location points"] || point["پوائنٹ کا ایڈریس"] || '');
-
-                // Setup dynamic distance badges
-                let distanceBadgeMarkup = '';
-                if (showDistance && point.distance !== undefined && point.distance !== Infinity) {
-                    const isClosest = index === 0;
-                    const badgeBg = isClosest ? 'bg-amber-100 border-amber-300 text-amber-950 font-black' : 'bg-emerald-50 border-emerald-200 text-emerald-800';
-                    const badgeText = isClosest ? `${i18n[currentLanguage].closestBadge} | ` : '';
-                    
-                    let distanceStr = '';
-                    if (point.distance < 1) {
-                        const meters = Math.round(point.distance * 1000);
-                        distanceStr = `${meters} ${i18n[currentLanguage].meters}`;
-                    } else {
-                        distanceStr = `${point.distance.toFixed(1)} ${i18n[currentLanguage].kilometers}`;
-                    }
-                    
-                    distanceBadgeMarkup = `
-                        <span class="${badgeBg} px-2.5 py-1 rounded-lg text-[10px] md:text-xs border flex items-center gap-1 shadow-sm">
-                            📍 ${badgeText} ${distanceStr} ${i18n[currentLanguage].away}
-                        </span>`;
-                }
-
-                const pointCard = document.createElement('div');
-                pointCard.className = "bg-white border border-[#E9D5BE]/50 rounded-2xl p-5 shadow-sm hover:shadow-md flex flex-col justify-between space-y-4 hover:border-[#0f5132]/30 transition duration-150 interactive-card";
-                
-                let mapBtnMarkup = '';
-                if (mapLink) {
-                    const mapBtnText = i18n[currentLanguage].getDirections || i18n[currentLanguage].mapBtn;
-                    mapBtnMarkup = `
-                        <a href="${mapLink}" target="_blank" class="flex-1 py-2.5 px-3 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 font-extrabold rounded-xl text-xs transition duration-150 flex items-center justify-center gap-1.5 shadow-sm">
-                            <span>🗺️</span> ${mapBtnText}
-                        </a>`;
-                } else {
-                    mapBtnMarkup = `
-                        <button onclick="triggerDirectAddLocationLink('${ucName}', '${srNo}')" class="flex-1 py-2.5 px-3 bg-[#FAF4EE] hover:bg-[#F3E6D5] border border-[#E9D5BE] text-[#8B5A2B] font-extrabold rounded-xl text-xs transition duration-150 flex items-center justify-center gap-1.5 animate-pulse shadow-sm">
-                            <span>➕</span> ${i18n[currentLanguage].addMapBtn}
-                        </button>`;
-                }
-
-                pointCard.innerHTML = `
-                    <div class="space-y-3">
-                        <div class="flex justify-between items-center gap-2 flex-wrap">
-                            <div class="flex items-center gap-1.5">
-                                <span class="bg-emerald-50 text-[#0f5132] px-2.5 py-1 rounded-lg text-xs font-extrabold border border-emerald-100 shadow-sm">${i18n[currentLanguage].serial} #${srNo}</span>
-                                <span class="text-[10px] font-extrabold bg-[#FAF4EE] px-2 py-1 rounded text-clay-brown border border-[#E9D5BE]/30">${ucName}</span>
-                            </div>
-                            ${distanceBadgeMarkup}
+                <!-- Search Container with GPS Proximity button -->
+                <div class="search-container">
+                    <div class="search-row">
+                        <div class="search-field">
+                            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: #64748b; width: 18px; height: 18px;">
+                                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            </svg>
+                            <input type="text" id="omniSearchInput" oninput="handleSearch()"
+                                   placeholder="پوائنٹ کا نام، ذمہ دار کا نام، لوکیشن (انگلش یا اردو) سے تلاش کریں..." 
+                                   class="search-input">
                         </div>
-                        <h4 class="text-base font-extrabold text-[#0f5132] leading-snug">${pointName}</h4>
-                        
-                        <div class="bg-[#FAF8F4] p-3 rounded-xl border border-slate-100 text-xs text-slate-600 space-y-1.5">
-                            <p class="flex items-start gap-1.5">
-                                <span class="text-[#0f5132] font-extrabold shrink-0">${currentLanguage === 'ur' ? 'پتہ:' : 'Address:'}</span> 
-                                <span class="font-semibold text-slate-800">${address}</span>
-                            </p>
-                            <p class="flex items-center gap-1.5">
-                                <span class="text-[#0f5132] font-extrabold">${i18n[currentLanguage].responsible}:</span> 
-                                <span class="font-bold text-slate-800">${responsiblePerson}</span>
-                            </p>
-                            <p class="flex items-center gap-1.5" dir="ltr">
-                                <span class="text-[#0f5132] font-extrabold">📞 :</span>
-                                <span class="font-extrabold text-slate-800">${point["موبائل نمبر"]}</span>
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="flex gap-2 pt-3 border-t border-slate-100">
-                        ${mapBtnMarkup}
-                        <a href="https://wa.me/${cleanPhone}" target="_blank" class="flex-1 py-2.5 px-3 bg-emerald-700 hover:bg-[#0f5132] border border-[#0f5132] text-white font-extrabold rounded-xl text-xs transition duration-150 flex items-center justify-center gap-1.5 shadow-sm">
-                            <span>💬</span> ${i18n[currentLanguage].whatsappBtn}
-                        </a>
-                        <button onclick="openShareModal('${point["نمبر شمار"]}')" class="p-2.5 bg-[#FAF4EE] hover:bg-[#F3E6D5] border border-[#E9D5BE] text-[#8B5A2B] rounded-xl text-xs font-extrabold transition duration-150 shadow-sm" title="${i18n[currentLanguage].shareBtn}">
-                            <span>📢</span>
+                        <!-- GPS Nearest Button -->
+                        <button onclick="findNearestPoints()" class="gps-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; display: inline-block;">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                            </svg>
+                            <span id="nearestBtnLabel">قریبی لوکیشن دیکھیں</span>
                         </button>
                     </div>
-                `;
-                listContainer.appendChild(pointCard);
-            });
+                    <div id="searchStats" class="search-stats hidden"></div>
+                </div>
 
-            document.getElementById('pointsListSection').classList.remove('hidden');
-        }
-
-        // Global Omni Database Search logic calculation
-        function handleSearch() {
-            const query = document.getElementById('omniSearchInput').value.trim().toLowerCase();
-            const statsContainer = document.getElementById('searchStats');
-            
-            if (!query) {
-                statsContainer.classList.add('hidden');
-                if (activeSelectedUc) {
-                    handleUcCardClick(activeSelectedUc);
-                } else {
-                    backToUcGrid();
-                }
-                return;
-            }
-
-            const hits = sheetDataset.filter(row => {
-                const addressUrdu = (row["پوائنٹ کا ایڈریس"] || "").toLowerCase();
-                const addressEnglish = (row["location points"] || "").toLowerCase();
-                const zimadarName = (row["پوائنٹ ذمہ دار"] || "").toLowerCase();
-                const zimadarNameEnglish = (row["Point responsible"] || "").toLowerCase();
-                const ucCell = (row["یو سی"] || "").toLowerCase();
-                const ucCellEnglish = (row["uc"] || "").toLowerCase();
-                
-                return addressUrdu.includes(query) || 
-                       addressEnglish.includes(query) || 
-                       zimadarName.includes(query) ||
-                       zimadarNameEnglish.includes(query) ||
-                       ucCell.includes(query) ||
-                       ucCellEnglish.includes(query);
-            });
-
-            document.getElementById('ucGridSection').classList.add('hidden');
-            document.getElementById('pointsSectionHeader').innerText = `${i18n[currentLanguage].searchResults} (${hits.length} ${i18n[currentLanguage].foundPoints})`;
-            
-            let summaryText = i18n[currentLanguage].searchSummary
-                .replace("{total}", sheetDataset.length)
-                .replace("{count}", hits.length);
-
-            statsContainer.innerText = summaryText;
-            statsContainer.classList.remove('hidden');
-
-            renderPointsListMarkup(hits);
-        }
-
-        // Contextual Quick shortcut bridge route map linking to update menu option
-        function triggerDirectAddLocationLink(ucName, srNo) {
-            switchTab('addLocation');
-            document.getElementById('formUcSelect').value = ucName;
-            populateFormSerialNumbers();
-            document.getElementById('formSrNoSelect').value = srNo;
-            
-            showToast(i18n[currentLanguage].toastAutoSelected, "info");
-        }
-
-        // Dynamic select dropdown option populate mapping matrix
-        function populateFormUcDropdowns() {
-            const ucDropdown = document.getElementById('formUcSelect');
-            ucDropdown.innerHTML = `<option value="">${i18n[currentLanguage].selectUcDefault}</option>`;
-
-            uniqueUcsList.forEach(uc => {
-                const opt = document.createElement('option');
-                opt.value = uc;
-                opt.innerText = uc;
-                ucDropdown.appendChild(opt);
-            });
-        }
-
-        // Populate nested conditional dropdown based on selected parent category list
-        function populateFormSerialNumbers() {
-            const selectedUc = document.getElementById('formUcSelect').value;
-            const srDropdown = document.getElementById('formSrNoSelect');
-            srDropdown.innerHTML = `<option value="">${i18n[currentLanguage].selectPointDefault}</option>`;
-
-            if (!selectedUc) return;
-
-            const missingMapPoints = sheetDataset.filter(row => {
-                const rowUc = currentLanguage === 'ur'
-                    ? (row["یو سی"] || "")
-                    : (row["uc"] || row["یو سی"] || "");
-                const isMatch = rowUc.trim() === selectedUc.trim();
-                const hasNoMap = (!row["Google Map Link"] || row["Google Map Link"].trim() === "") && 
-                                 (!row["cordinates"] || row["cordinates"].trim() === "");
-                return isMatch && hasNoMap;
-            });
-
-            if (missingMapPoints.length === 0) {
-                srDropdown.innerHTML = `<option value="">${i18n[currentLanguage].allPointsUpdated}</option>`;
-                return;
-            }
-
-            missingMapPoints.forEach(point => {
-                const opt = document.createElement('option');
-                opt.value = point["نمبر شمار"];
-                const address = currentLanguage === 'ur' 
-                    ? (point["پوائنٹ کا ایڈریس"] || point["location points"] || '')
-                    : (point["location points"] || point["پوائنٹ کا ایڈریس"] || '');
-                opt.innerText = `${i18n[currentLanguage].serial} ${point["نمبر شمار"]} - ${address}`;
-                srDropdown.appendChild(opt);
-            });
-        }
-
-        // Submit form parameters using GET action
-        function submitLocationUpdate() {
-            const uc = document.getElementById('formUcSelect').value;
-            const srNo = document.getElementById('formSrNoSelect').value;
-            const userInput = document.getElementById('formMapUrlInput').value.trim();
-            const password = document.getElementById('formPasswordInput').value.trim();
-
-            if (!uc || !srNo || !userInput || !password) {
-                showToast(i18n[currentLanguage].toastAllFields, "error");
-                return;
-            }
-
-            // Find the selected point row in our dataset using unique Serial Number
-            const targetPoint = sheetDataset.find(row => String(row["نمبر شمار"]) === String(srNo));
-            if (!targetPoint) {
-                showToast("پوائنٹ نہیں ملا / Point not found", "error");
-                return;
-            }
-
-            // Always send the canonical Urdu UC name to the Apps Script to match the spreadsheet cell exactly
-            const canonicalUc = targetPoint["یو سی"] || uc;
-
-            const isRawCoords = /^-?\d+\.\d+\s*,\s*-?\d+\.\d+$/.test(userInput);
-            const isUrl = userInput.startsWith("http://") || userInput.startsWith("https://");
-
-            if (!isRawCoords && !isUrl) {
-                showToast(i18n[currentLanguage].toastValidUrl, "error");
-                return;
-            }
-
-            let mapLinkParam = "";
-            let cordinatesParam = "";
-
-            if (isRawCoords) {
-                cordinatesParam = userInput;
-                mapLinkParam = "https://maps.google.com/?q=" + userInput;
-            } else {
-                mapLinkParam = userInput;
-                const parsed = parseCoordsFromUrl(userInput);
-                if (parsed) {
-                    cordinatesParam = `${parsed.lat},${parsed.lng}`;
-                }
-            }
-
-            document.getElementById('appSpinner').classList.remove('hidden');
-            document.getElementById('addLocationTabScreen').classList.add('opacity-40', 'pointer-events-none');
-
-            // Constructing clean query params for GET request
-            const updateUrl = API_URL
-                + "?action=updateLocation"
-                + "&uc=" + encodeURIComponent(canonicalUc)
-                + "&srNo=" + encodeURIComponent(srNo)
-                + "&mapLink=" + encodeURIComponent(mapLinkParam)
-                + "&cordinates=" + encodeURIComponent(cordinatesParam)
-                + "&password=" + encodeURIComponent(password);
-
-            fetch(updateUrl, { redirect: 'follow' })
-            .then(res => {
-                if (!res.ok) throw new Error("HTTP error: " + res.status);
-                return res.text();
-            })
-            .then(text => {
-                let response;
-                try {
-                    response = JSON.parse(text);
-                } catch (e) {
-                    console.error("JSON Parse Error on update. Raw:", text.substring(0, 500));
-                    throw new Error("سرور سے غیر متوقع جواب آیا۔ / Unexpected server response.");
-                }
-                document.getElementById('appSpinner').classList.add('hidden');
-                document.getElementById('addLocationTabScreen').classList.remove('opacity-40', 'pointer-events-none');
-
-                if (response.status === "success") {
-                    showToast(i18n[currentLanguage].toastUpdated, "success");
-                    document.getElementById('formMapUrlInput').value = '';
-                    document.getElementById('formPasswordInput').value = '';
-                    fetchDatasetFromGoogleSheet();
-                } else {
-                    showToast(response.message || "اپڈیٹ کرنے میں خرابی آئی ہے / Error updating location", "error");
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                document.getElementById('appSpinner').classList.add('hidden');
-                document.getElementById('addLocationTabScreen').classList.remove('opacity-40', 'pointer-events-none');
-                showToast(i18n[currentLanguage].connectionError, "error");
-            });
-        }
-
-        // Tab viewport layout context swapper
-        function switchTab(target) {
-            const homeScreen = document.getElementById('homeTabScreen');
-            const addLocScreen = document.getElementById('addLocationTabScreen');
-
-            // Bottom navbar highlight
-            const navHome = document.getElementById('navHomeBtn');
-            const navNearest = document.getElementById('navNearestBtn');
-            const navAdd = document.getElementById('navAddBtn');
-            if (navHome) navHome.classList.remove('text-[#0f5132]', 'font-extrabold');
-            if (navNearest) navNearest.classList.remove('text-[#0f5132]', 'font-extrabold');
-            if (navAdd) navAdd.classList.remove('text-[#0f5132]', 'font-extrabold');
-
-            if (target === 'home') {
-                if (navHome) navHome.classList.add('text-[#0f5132]', 'font-extrabold');
-                homeScreen.classList.remove('hidden');
-                addLocScreen.classList.add('hidden');
-                if (activeSelectedUc) {
-                    document.getElementById('ucGridSection').classList.add('hidden');
-                    document.getElementById('pointsListSection').classList.remove('hidden');
-                } else {
-                    document.getElementById('ucGridSection').classList.remove('hidden');
-                    document.getElementById('pointsListSection').classList.add('hidden');
-                }
-            } else if (target === 'addLocation') {
-                if (navAdd) navAdd.classList.add('text-[#0f5132]', 'font-extrabold');
-                addLocScreen.classList.remove('hidden');
-                homeScreen.classList.add('hidden');
-                populateFormUcDropdowns();
-            }
-        }
-
-        // Premium HTML Canvas Dynamic Graphic Image Poster Maker
-        function generateAndSharePosterImage(type, referenceKey) {
-            const canvasTitle = document.getElementById('canvasDynamicTitle');
-            const canvasBody = document.getElementById('canvasDynamicBody');
-            
-            let filename = "Qurbani-Campaign-Poster.png";
-            let textMessage = `قربانی کی کھالیں مہم 2026 - دعوتِ اسلامی کینٹ ٹاؤن راولپنڈی\n\n`;
-
-            if (type === 'location') {
-                const targetRow = sheetDataset.find(row => row["نمبر شمار"] === referenceKey);
-                if (!targetRow) return;
-
-                canvasTitle.innerText = `${targetRow["یو سی"]}`;
-                filename = `${targetRow["یو سی"]}-پوائنٹ-${referenceKey}.png`;
-
-                const address = currentLanguage === 'ur' 
-                    ? (targetRow["پوائنٹ کا ایڈریس"] || targetRow["location points"] || '')
-                    : (targetRow["location points"] || targetRow["پوائنٹ کا ایڈریس"] || '');
-
-                const responsiblePerson = currentLanguage === 'ur'
-                    ? (targetRow["پوائنٹ ذمہ دار"] || "")
-                    : (targetRow["Point responsible"] || targetRow["پوائنٹ ذمہ دار"] || "");
-
-                canvasBody.innerHTML = `
-                    <div class="text-center bg-black/20 p-3 rounded-xl border border-white/5 space-y-1">
-                        <span class="text-yellow-400 font-bold text-xs">${i18n[currentLanguage].posterAddress}</span>
-                        <p class="text-lg font-bold text-white leading-relaxed font-naskh">${address}</p>
+                <!-- Union Councils Grid Block -->
+                <div id="ucGridSection" class="section-spacing">
+                    <h2 class="section-heading">
+                        <span class="heading-accent">❖</span>
+                        <span id="ucSectionHeading">یوزیز (UC) کی فہرست</span>
+                    </h2>
+                    <div id="ucCardGrid" class="uc-grid">
+                        <!-- UC Cards populated dynamically -->
                     </div>
-                    <div class="grid grid-cols-2 gap-2 pt-2">
-                        <div class="bg-black/20 p-2.5 rounded-xl border border-white/5 text-center">
-                            <span class="text-emerald-400 text-xs font-bold block mb-1">${i18n[currentLanguage].posterRep}</span>
-                            <span class="text-sm text-slate-100 font-bold">${responsiblePerson}</span>
-                        </div>
-                        <div class="bg-black/20 p-2.5 rounded-xl border border-white/5 text-center">
-                            <span class="text-emerald-400 text-xs font-bold block mb-1">${i18n[currentLanguage].posterPhone}</span>
-                            <span class="text-sm font-mono text-slate-100 font-bold">${targetRow["موبائل نمبر"]}</span>
-                        </div>
+                </div>
+
+                <!-- Detailed Points List Block -->
+                <div id="pointsListSection" class="section-spacing hidden">
+                    <hr class="section-divider" />
+                    <div class="section-header-row">
+                        <h2 id="pointsSectionHeader" class="points-section-title"></h2>
+                        <button id="backToUcsBtn" onclick="backToUcGrid()" class="btn btn-ghost">
+                            ← تمام یوزیز واپس دیکھیں
+                        </button>
                     </div>
-                `;
+                    <div id="pointsContainerList" class="points-grid">
+                        <!-- Points cards populated dynamically -->
+                    </div>
+                </div>
 
-                let sharedMapLink = targetRow["Google Map Link"] ? targetRow["Google Map Link"].trim() : "";
-                if (!sharedMapLink && targetRow["cordinates"]) {
-                    const cleanCoords = targetRow["cordinates"].trim();
-                    if (/^-?\d+\.\d+\s*,\s*-?\d+\.\d+$/.test(cleanCoords)) {
-                        sharedMapLink = "https://maps.google.com/?q=" + cleanCoords;
-                    } else if (cleanCoords.startsWith("http://") || cleanCoords.startsWith("https://")) {
-                        sharedMapLink = cleanCoords;
-                    }
-                }
-                textMessage += `📍 یو سی: ${targetRow["یو سی"]}\n🏠 ایڈریس: ${address}\n👤 ذمہ دار: ${responsiblePerson}\n📞 رابطہ نمبر: ${targetRow["موبائل نمبر"]}\n`;
-                if(sharedMapLink) textMessage += `🗺️ میپ لوکیشن: ${sharedMapLink}\n`;
-            }
+            </div>
 
-            showToast(i18n[currentLanguage].sharingPoster, "info");
-            const captureCanvasTarget = document.getElementById('imagePosterGeneratorCanvas');
-            
-            html2canvas(captureCanvasTarget, { scale: 2.5, backgroundColor: '#011c36' }).then(canvas => {
-                canvas.toBlob(blob => {
-                    const imgFile = new File([blob], filename, { type: 'image/png' });
+            <!-- Tab 2 Screen: Add Map Location -->
+            <div id="addLocationTabScreen" class="hidden" style="max-width: 32rem; margin: 0 auto;">
+                <div class="form-container">
+                    <div class="gradient-bar-thick" style="position: absolute; top: 0; left: 0; right: 0;"></div>
                     
-                    if (navigator.canShare && navigator.canShare({ files: [imgFile] })) {
-                        navigator.share({
-                            files: [imgFile],
-                            title: i18n[currentLanguage].title,
-                            text: textMessage
-                        })
-                        .then(() => showToast(i18n[currentLanguage].successShare))
-                        .catch(err => {
-                            console.log("Share cancelled: ", err);
-                            fallbackDownloadMechanism(canvas, filename);
-                        });
-                    } else {
-                        fallbackDownloadMechanism(canvas, filename);
-                    }
-                }, 'image/png');
-            });
-        }
+                    <div style="margin-bottom: 20px;">
+                        <h2 class="points-section-title" style="font-size: 1.25rem; display: flex; align-items: center; gap: 8px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px; color: var(--clr-primary); flex-shrink: 0;">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                            </svg>
+                            <span id="formTitleText">گوگل میپ لوکیشن لنک اپڈیٹ کریں</span>
+                        </h2>
+                        <p id="formSubtitleText" class="modal-desc" style="margin-top: 4px;">فہرست میں صرف وہی پوائنٹس نظر آئیں گے جن کا میپ لنک شیٹ پر اب تک شامل نہیں ہے۔</p>
+                    </div>
 
-        // Modal and Text Sharing options controllers
-        let activeShareReferenceKey = null;
+                    <hr class="section-divider" style="margin-bottom: 20px;" />
 
-        function openShareModal(referenceKey) {
-            activeShareReferenceKey = referenceKey;
-            
-            // Apply current language translations
-            document.getElementById('shareModalTitle').innerText = i18n[currentLanguage].shareModalTitle;
-            document.getElementById('shareModalDesc').innerText = i18n[currentLanguage].shareModalDesc;
-            document.getElementById('shareOptPosterTitle').innerText = i18n[currentLanguage].shareOptPosterTitle;
-            document.getElementById('shareOptPosterDesc').innerText = i18n[currentLanguage].shareOptPosterDesc;
-            document.getElementById('shareOptTextTitle').innerText = i18n[currentLanguage].shareOptTextTitle;
-            document.getElementById('shareOptTextDesc').innerText = i18n[currentLanguage].shareOptTextDesc;
+                    <!-- Step indicator -->
+                    <div class="form-step-indicator">
+                        <div class="form-step">
+                            <span class="form-step-number">1</span>
+                            <span class="form-step-line"></span>
+                        </div>
+                        <div class="form-step">
+                            <span class="form-step-number">2</span>
+                            <span class="form-step-line"></span>
+                        </div>
+                        <div class="form-step">
+                            <span class="form-step-number">3</span>
+                        </div>
+                    </div>
 
-            const modal = document.getElementById('shareOptionsModal');
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                modal.querySelector('div').classList.remove('scale-95');
-            }, 20);
-        }
+                    <div class="section-spacing" style="gap: 16px;">
+                        <div class="form-field">
+                            <label id="formUcSelectLabel" class="form-label">1۔ یو سی (UC) منتخب کریں:</label>
+                            <select id="formUcSelect" onchange="populateFormSerialNumbers()" class="form-select">
+                                <option value="">-- یو سی منتخب کریں --</option>
+                            </select>
+                        </div>
 
-        function closeShareModal() {
-            const modal = document.getElementById('shareOptionsModal');
-            modal.classList.add('opacity-0');
-            modal.querySelector('div').classList.add('scale-95');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
-        }
+                        <div class="form-field">
+                            <label id="formSrNoSelectLabel" class="form-label">2۔ نمبر شمار / پوائنٹ منتخب کریں:</label>
+                            <select id="formSrNoSelect" class="form-select">
+                                <option value="">-- پہلے یو سی منتخب کریں --</option>
+                            </select>
+                        </div>
 
-        function handleShareOption(option) {
-            closeShareModal();
-            setTimeout(() => {
-                if (option === 'poster') {
-                    generateAndSharePosterImage('location', activeShareReferenceKey);
-                } else if (option === 'text') {
-                    shareTextMessage(activeShareReferenceKey);
-                }
-            }, 300);
-        }
+                        <div class="form-field">
+                            <label id="formMapUrlInputLabel" class="form-label">3۔ گوگل میپ لوکیشن لنک (Google Map Link):</label>
+                            <input type="text" id="formMapUrlInput" placeholder="Enter Google Maps URL or coordinates (e.g., 33.598379,73.022724)" class="form-input">
+                        </div>
 
-        function shareTextMessage(referenceKey) {
-            const targetRow = sheetDataset.find(row => row["نمبر شمار"] === referenceKey);
-            if (!targetRow) return;
+                        <div class="form-security-box">
+                            <label class="form-label" style="color: var(--clr-secondary); display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; flex-shrink: 0;">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                                </svg>
+                                <span id="formPasswordInputLabel">سیکیورٹی پاس ورڈ تصدیق:</span>
+                            </label>
+                            <input type="password" id="formPasswordInput" maxlength="4" placeholder="منتخب کردہ ذمہ دار کے موبائل نمبر کے آخری 4 ہندسے لکھیں" class="form-security-input">
+                        </div>
 
-            const srNo = targetRow["نمبر شمار"];
-            
-            // Strictly single-language values — no cross-language fallback
-            let ucName, pointName, address, responsiblePerson;
+                        <button onclick="submitLocationUpdate()" class="btn btn-primary btn-full" style="padding: 14px 20px; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px; color: white;">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+                            </svg>
+                            <span id="formSubmitBtnLabel">گوگل شیٹ پر محفوظ کریں</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-            if (currentLanguage === 'ur') {
-                ucName = targetRow["یو سی"] || "";
-                pointName = targetRow["پوائنٹ کا نام"] || `پوائنٹ #${srNo}`;
-                address = targetRow["پوائنٹ کا ایڈریس"] || "";
-                responsiblePerson = targetRow["پوائنٹ ذمہ دار"] || "";
-            } else {
-                ucName = targetRow["uc"] || "";
-                pointName = targetRow["Point Name"] || `Point #${srNo}`;
-                address = targetRow["location points"] || "";
-                responsiblePerson = targetRow["Point responsible"] || "";
-            }
+        </main>
 
-            // Setup map link fallback
-            let sharedMapLink = targetRow["Google Map Link"] ? targetRow["Google Map Link"].trim() : "";
-            if (!sharedMapLink && targetRow["cordinates"]) {
-                const cleanCoords = targetRow["cordinates"].trim();
-                if (/^-?\d+\.\d+\s*,\s*-?\d+\.\d+$/.test(cleanCoords)) {
-                    sharedMapLink = "https://maps.google.com/?q=" + cleanCoords;
-                } else if (cleanCoords.startsWith("http://") || cleanCoords.startsWith("https://")) {
-                    sharedMapLink = cleanCoords;
-                }
-            }
+        <!-- Hidden Poster Generator Target -->
+        <div class="poster-offscreen">
+            <div id="imagePosterGeneratorCanvas" class="w-[500px] aspect-[2/3] bg-gradient-to-b from-[#064e3b] via-[#022c22] to-[#011c15] p-5 flex flex-col justify-between relative" dir="rtl" style="box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);">
+                <!-- Dotted pattern overlay -->
+                <div class="absolute inset-0 opacity-5 pointer-events-none bg-repeat" style="background-image: radial-gradient(circle, white 2.5px, transparent 2.5px); background-size: 24px 24px; z-index: 1;"></div>
+                
+                <!-- Large Islamic Crescent Background SVG -->
+                <div class="absolute inset-0 pointer-events-none z-0 opacity-10 flex items-center justify-center" style="transform: scale(1.3); z-index: 0;">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width: 240px; height: 240px; color: #ffd700;">
+                        <path d="M12 3a9 9 0 1 0 9 9 9.75 9.75 0 0 1-9-9zM19.5 5.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                    </svg>
+                </div>
 
-            // Create beautifully formatted bilingually-tailored Text Message
-            let headingText = "";
-            let subheadingText = "";
-            let brandText = "";
-            let callToActionText = "";
+                <div class="text-center space-y-2.5 relative z-10">
+                    <h2 id="posterMainTitle" class="font-nastaliq poster-glow text-5xl font-black tracking-normal py-1 leading-tight drop-shadow-2xl">قربانی کی کھالیں</h2>
+                    <p id="posterSubTitle" class="text-yellow-200 text-[10px] font-extrabold tracking-widest bg-black/40 px-4 py-1.5 rounded-full inline-block border border-yellow-500/20 uppercase" style="font-family: 'Outfit', sans-serif;">عاشقان رسول کی دینی تحریک</p>
+                    <h1 id="posterBrandTitle" class="font-naskh text-[#ffd700] text-3xl font-black py-0.5 leading-none" style="text-shadow: 0 4px 12px rgba(250, 204, 21, 0.4); letter-spacing: 1px;">دعوت اسلامی</h1>
+                    <p id="posterActionTitle" class="font-naskh text-emerald-100 text-xs font-bold" style="opacity: 0.9;">کو دے کر دینی کاموں میں حصہ لیجیے</p>
+                </div>
 
-            if (currentLanguage === 'ur') {
-                headingText = "قربانی کی کھالیں";
-                subheadingText = "عاشقانِ رسول کی دینی تحریک";
-                brandText = "دعوتِ اسلامی";
-                callToActionText = "کو دے کر دینی کاموں میں حصہ لیجیے!";
-            } else {
-                headingText = "Qurbani Hides";
-                subheadingText = "Religious Movement of Ashiqan-e-Rasool";
-                brandText = "Dawat-e-Islami";
-                callToActionText = "Donate your hides and participate in religious work!";
-            }
+                <div class="bg-gradient-to-b from-[#0b5a45] to-[#04382a] rounded-3xl border-2 border-[#ffd700] shadow-2xl overflow-hidden mt-4 flex-grow flex flex-col justify-between relative z-10" style="box-shadow: 0 20px 40px -10px rgba(0,0,0,0.6);">
+                    <div class="bg-gradient-to-r from-yellow-500 via-yellow-400 to-yellow-500 py-3 px-4 text-center border-b border-[#ffd700] relative">
+                        <!-- Top gold shine strip -->
+                        <div class="absolute top-0 inset-x-0 h-[1.5px] bg-white/40"></div>
+                        <h3 id="canvasDynamicTitle" class="font-naskh text-lg font-black text-emerald-950 leading-none">وارڈ لوکیشنز انفارمیشن</h3>
+                    </div>
+                    
+                    <div class="p-5 flex-grow flex flex-col justify-center">
+                        <div id="canvasDynamicBody" class="w-full text-slate-100 space-y-3.5">
+                            <!-- Dynamic details added via JS -->
+                        </div>
+                    </div>
 
-            let textMessage = `🌟 *${headingText}* 🌟\n✨ *${subheadingText}* ✨\n🕌 *${brandText}* 🕌\n📢 *${callToActionText}*\n\n`;
+                    <div id="posterFooterText" class="bg-black/40 py-2.5 text-center text-[10px] text-emerald-300 font-bold border-t border-white/5" style="letter-spacing: 0.5px; font-family: 'Outfit', sans-serif;">
+                        کینٹ ٹاؤن راولپنڈی مہم ڈیش بورڈ پینل
+                    </div>
+                </div>
+            </div>
+        </div>
 
-            if (currentLanguage === 'ur') {
-                textMessage += `📍 *لوکیشن نمبر (نمبر شمار):* ${srNo}\n`;
-                textMessage += `🏢 *پوائنٹ کا نام:* ${pointName}\n`;
-                textMessage += `🏢 *یو سی (UC):* ${ucName}\n`;
-                textMessage += `🏠 *پتہ:* ${address}\n`;
-                textMessage += `👤 *ذمہ دار:* ${responsiblePerson}\n`;
-                textMessage += `📞 *رابطہ نمبر:* ${targetRow["موبائل نمبر"]}\n`;
-                if(sharedMapLink) textMessage += `🗺️ *گوگل میپ لوکیشن:* ${sharedMapLink}\n`;
-            } else {
-                textMessage += `📍 *Point Serial / Number:* ${srNo}\n`;
-                textMessage += `🏢 *Point Name:* ${pointName}\n`;
-                textMessage += `🏢 *Union Council (UC):* ${ucName}\n`;
-                textMessage += `🏠 *Address:* ${address}\n`;
-                textMessage += `👤 *Person in Charge:* ${responsiblePerson}\n`;
-                textMessage += `📞 *Mobile Number:* ${targetRow["موبائل نمبر"]}\n`;
-                if(sharedMapLink) textMessage += `🗺️ *Google Map Link:* ${sharedMapLink}\n`;
-            }
+        <!-- Beautiful Share Options Modal -->
+        <div id="shareOptionsModal" class="modal-overlay">
+            <div class="modal-card">
+                <div class="gradient-bar-thick" style="position: absolute; top: 0; left: 0; right: 0;"></div>
+                <button onclick="closeShareModal()" class="modal-close-btn">×</button>
+                
+                <div class="modal-header" style="display: flex; flex-direction: column; align-items: center; gap: 4px; margin-bottom: 24px; padding-top: 12px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width: 32px; height: 32px; color: var(--clr-primary); margin-bottom: 4px;">
+                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v16"/>
+                    </svg>
+                    <h3 class="modal-title"><span id="shareModalTitle">شیئرنگ آپشنز</span></h3>
+                    <p id="shareModalDesc" class="modal-desc">براہ کرم منتخب کریں کہ آپ اسے کیسے شیئر کرنا چاہتے ہیں:</p>
+                </div>
 
-            // Direct Clipboard write + Share API
-            if (navigator.share) {
-                navigator.share({
-                    title: i18n[currentLanguage].title,
-                    text: textMessage
-                })
-                .then(() => showToast(i18n[currentLanguage].successShare))
-                .catch(err => {
-                    console.log("Direct share failed, falling back to clipboard", err);
-                    copyTextToClipboard(textMessage);
-                });
-            } else {
-                copyTextToClipboard(textMessage);
-            }
-        }
+                <div class="modal-options">
+                    <!-- Option 1: Poster Image -->
+                    <button type="button" onclick="handleShareOption('poster')" class="share-option-btn poster">
+                        <div class="share-option-content">
+                            <div class="share-option-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <span id="shareOptPosterTitle" class="share-option-title">تصویری پوسٹر (Image Poster)</span>
+                                <span id="shareOptPosterDesc" class="share-option-desc">پوائنٹ کارڈ کی خوبصورت تصویر تیار کریں</span>
+                            </div>
+                        </div>
+                        <span class="share-option-arrow">←</span>
+                    </button>
 
-        function copyTextToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                showToast(i18n[currentLanguage].textCopied, "success");
-            }).catch(err => {
-                console.error("Clipboard copy failed", err);
-            });
-        }
+                    <!-- Option 2: Text Post -->
+                    <button type="button" onclick="handleShareOption('text')" class="share-option-btn text-opt">
+                        <div class="share-option-content">
+                            <div class="share-option-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <span id="shareOptTextTitle" class="share-option-title">تحریری پیغام (Text Post)</span>
+                                <span id="shareOptTextDesc" class="share-option-desc">کاپی اور شیئر کرنے کے لیے تحریری پیغام</span>
+                            </div>
+                        </div>
+                        <span class="share-option-arrow">←</span>
+                    </button>
+                </div>
+            </div>
+        </div>
 
-        // Fallback file downloader generator
-        function fallbackDownloadMechanism(canvas, name) {
-            showToast(i18n[currentLanguage].fallbackShare, "info");
-            const anchor = document.createElement('a');
-            anchor.download = name;
-            anchor.href = canvas.toDataURL('image/png');
-            document.body.appendChild(anchor);
-            anchor.click();
-            document.body.removeChild(anchor);
-        }
+        <!-- Notification Container -->
+        <div id="toastNotificationShelf" class="toast-shelf"></div>
 
-        // Custom Toast Engine notifications rendering controller
-        function showToast(msg, type = "success") {
-            const shelf = document.getElementById('toastNotificationShelf');
-            const block = document.createElement('div');
-            block.className = `flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl border text-xs md:text-sm font-bold transition-all duration-300 transform translate-y-4 opacity-0 pointer-events-auto ${
-                type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 
-                type === 'error' ? 'bg-red-50 border-red-200 text-red-800' : 'bg-[#FAF4EE] border-[#E9D5BE] text-[#8B5A2B]'
-            }`;
-            
-            const icon = type === 'success' ? '✅' : type === 'error' ? '⚠️' : 'ℹ️';
-            block.innerHTML = `<span>${icon}</span><span class="flex-1">${msg}</span>`;
-            
-            shelf.appendChild(block);
-            setTimeout(() => block.classList.remove('translate-y-4', 'opacity-0'), 20);
-            setTimeout(() => {
-                block.classList.add('opacity-0', 'translate-y-4');
-                setTimeout(() => block.remove(), 300);
-            }, 4000);
-        }
-</script>
-<div class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-md flex justify-around items-center p-2 md:p-3">
-  <button id="navHomeBtn" type="button" class="flex flex-col items-center text-sm text-gray-600" onclick="switchTab('home')"><span class="text-2xl">🏠</span><span>Home</span></button>
-  <button id="navNearestBtn" type="button" class="flex flex-col items-center text-sm text-gray-600" onclick="findNearestPoints()"><span class="text-2xl">🔍</span><span>Nearest</span></button>
-  <button id="navAddBtn" type="button" class="flex flex-col items-center text-sm text-gray-600" onclick="switchTab('addLocation')"><span class="text-2xl">➕</span><span>Add</span></button>
-</div>
+        <!-- Bottom Navigation Bar -->
+        <nav class="bottom-nav">
+            <!-- Home Tab -->
+            <button id="navHomeBtn" type="button" class="nav-item active" onclick="switchTab('home')">
+                <span class="nav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                </span>
+                <span id="navHomeLabel" class="nav-label">Home</span>
+            </button>
+
+            <!-- Add Location Tab (FAB) -->
+            <button id="navAddBtn" type="button" class="nav-fab" onclick="switchTab('addLocation')">
+                <div class="fab-circle">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <line x1="12" y1="5" x2="12" y2="19"/>
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                </div>
+                <span id="navAddLabel" class="nav-label">Add Link</span>
+            </button>
+
+            <!-- GPS Nearest Tab -->
+            <button id="navNearestBtn" type="button" class="nav-item" onclick="findNearestPoints()">
+                <span class="nav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                </span>
+                <span id="navNearestLabel" class="nav-label">Nearest</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Scripts Loading -->
+    <script src="config.js"></script>
+    <script src="i18n.js"></script>
+    <script src="sharing/textShare.js"></script>
+    <script src="sharing/imagePoster.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>
